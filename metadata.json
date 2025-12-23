@@ -1,0 +1,7 @@
+{
+  "name": "Nuswally Lillah",
+  "description": "A compassionate, trustworthy Islamic digital hub for worship, learning, and community.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

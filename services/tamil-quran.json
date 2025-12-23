@@ -1,0 +1,919 @@
+{
+    "language": "tamil",
+    "reciterName": "Tamil Translation",
+    "baseUrl": "https://archive.org/download/tamilquranmp3/",
+    "chapters": [
+        {
+            "index": 1,
+            "name": "அல்ஃபாத்திஹா",
+            "nameTrans": "Surah al-Fatihah",
+            "fileName": "tamilsura-001.mp3",
+            "size": "668.0K",
+            "durationInSecs": 56
+        },
+        {
+            "index": 2,
+            "name": "ஸூரத்துல் பகரா",
+            "nameTrans": "Surah al-Baqarah",
+            "fileName": "tamilsura-002.mp3",
+            "size": "81.1M",
+            "durationInSecs": 4515
+        },
+        {
+            "index": 3,
+            "name": "ஸூரத்துல்ஆல இம்ரான்",
+            "nameTrans": "Surah Al-Imran",
+            "fileName": "tamilsura-003.mp3",
+            "size": "49.0M",
+            "durationInSecs": 3939
+        },
+        {
+            "index": 4,
+            "name": "ஸூரத்துன்னிஸாவு",
+            "nameTrans": "Surah an-Nisa'",
+            "fileName": "tamilsura-004.mp3",
+            "size": "51.7M",
+            "durationInSecs": 4148
+        },
+        {
+            "index": 5,
+            "name": "ஸூரத்துல் மாயிதா",
+            "nameTrans": "Surah al-Ma'idah",
+            "fileName": "tamilsura-005.mp3",
+            "size": "39.4M",
+            "durationInSecs": 3256
+        },
+        {
+            "index": 6,
+            "name": "ஸூரத்துல் அன்ஆம்",
+            "nameTrans": "Surah al-An`am",
+            "fileName": "tamilsura-006.mp3",
+            "size": "43.1M",
+            "durationInSecs": 3372
+        },
+        {
+            "index": 7,
+            "name": "ஸூரத்துல் அஃராஃப்",
+            "nameTrans": "Surah al-A`raf",
+            "fileName": "tamilsura-007.mp3",
+            "size": "47.2M",
+            "durationInSecs": 3784
+        },
+        {
+            "index": 8,
+            "name": "ஸூரத்துல் அன்ஃபால்",
+            "nameTrans": "Surah al-Anfal",
+            "fileName": "tamilsura-008.mp3",
+            "size": "17.1M",
+            "durationInSecs": 1353
+        },
+        {
+            "index": 9,
+            "name": "ஸூரத்துத் தவ்பா",
+            "nameTrans": "Surah at-Taubah",
+            "fileName": "tamilsura-009.mp3",
+            "size": "33.7M",
+            "durationInSecs": 2743
+        },
+        {
+            "index": 10,
+            "name": "ஸூரத்து யூனுஸ்",
+            "nameTrans": "Surah Yunus",
+            "fileName": "tamilsura-010.mp3",
+            "size": "24.0M",
+            "durationInSecs": 1974
+        },
+        {
+            "index": 11,
+            "name": "ஸூரத்து ஹூது",
+            "nameTrans": "Surah Hud",
+            "fileName": "tamilsura-011.mp3",
+            "size": "27.5M",
+            "durationInSecs": 2161
+        },
+        {
+            "index": 12,
+            "name": "ஸூரத்து யூஸுஃப்",
+            "nameTrans": "Surah Yusuf",
+            "fileName": "tamilsura-012.mp3",
+            "size": "25.9M",
+            "durationInSecs": 2094
+        },
+        {
+            "index": 13,
+            "name": "ஸூரத்துர் ரஃது",
+            "nameTrans": "Surah ar-Ra`d",
+            "fileName": "tamilsura-013.mp3",
+            "size": "12.0M",
+            "durationInSecs": 937
+        },
+        {
+            "index": 14,
+            "name": "ஸூரத்து இப்ராஹீம்",
+            "nameTrans": "Surah Ibrahim",
+            "fileName": "tamilsura-014.mp3",
+            "size": "13.1M",
+            "durationInSecs": 1008
+        },
+        {
+            "index": 15,
+            "name": "ஸூரத்துல் ஹிஜ்ர்",
+            "nameTrans": "Surah al-Hijr",
+            "fileName": "tamilsura-015.mp3",
+            "size": "10.7M",
+            "durationInSecs": 846
+        },
+        {
+            "index": 16,
+            "name": "ஸூரத்துந் நஹ்ல்",
+            "nameTrans": "Surah an-Nahl",
+            "fileName": "tamilsura-016.mp3",
+            "size": "27.9M",
+            "durationInSecs": 2143
+        },
+        {
+            "index": 17,
+            "name": "பனீ இஸ்ராயீல்",
+            "nameTrans": "Surah Al-Isra",
+            "fileName": "tamilsura-017.mp3",
+            "size": "24.5M",
+            "durationInSecs": 1870
+        },
+        {
+            "index": 18,
+            "name": "ஸூரத்துல் கஹ்ஃபு",
+            "nameTrans": "Surah al-Kahf",
+            "fileName": "tamilsura-018.mp3",
+            "size": "24.5M",
+            "durationInSecs": 1881
+        },
+        {
+            "index": 19,
+            "name": "ஸூரத்து மர்யம்",
+            "nameTrans": "Surah Maryam",
+            "fileName": "tamilsura-019.mp3",
+            "size": "16.0M",
+            "durationInSecs": 1261
+        },
+        {
+            "index": 20,
+            "name": "ஸூரத்து தாஹா",
+            "nameTrans": "Surah Ta Ha",
+            "fileName": "tamilsura-020.mp3",
+            "size": "20.8M",
+            "durationInSecs": 1626
+        },
+        {
+            "index": 21,
+            "name": "ஸூரத்துல் அன்பியா",
+            "nameTrans": "Surah al-Anbiya'",
+            "fileName": "tamilsura-021.mp3",
+            "size": "18.3M",
+            "durationInSecs": 1432
+        },
+        {
+            "index": 22,
+            "name": "ஸூரத்துல் ஹஜ்",
+            "nameTrans": "Surah al-Hajj",
+            "fileName": "tamilsura-022.mp3",
+            "size": "18.0M",
+            "durationInSecs": 1433
+        },
+        {
+            "index": 23,
+            "name": "ஸூரத்துல் முஃமினூன்",
+            "nameTrans": "Surah al-Mu'minun",
+            "fileName": "tamilsura-023.mp3",
+            "size": "16.0M",
+            "durationInSecs": 1278
+        },
+        {
+            "index": 24,
+            "name": "ஸூரத்துந் நூர்",
+            "nameTrans": "Surah an-Nur",
+            "fileName": "tamilsura-024.mp3",
+            "size": "19.6M",
+            "durationInSecs": 1539
+        },
+        {
+            "index": 25,
+            "name": "ஸூரத்துல் ஃபுர்ஃகான்",
+            "nameTrans": "Surah al-Furqan",
+            "fileName": "tamilsura-025.mp3",
+            "size": "13.1M",
+            "durationInSecs": 1071
+        },
+        {
+            "index": 26,
+            "name": "ஸூரத்துஷ்ஷுஃரா",
+            "nameTrans": "Surah ash-Shu`ara'",
+            "fileName": "tamilsura-026.mp3",
+            "size": "20.3M",
+            "durationInSecs": 1661
+        },
+        {
+            "index": 27,
+            "name": "ஸூரத்துந் நம்லி",
+            "nameTrans": "Surah an-Naml",
+            "fileName": "tamilsura-027.mp3",
+            "size": "17.1M",
+            "durationInSecs": 1371
+        },
+        {
+            "index": 28,
+            "name": "ஸூரத்துல் கஸஸ்",
+            "nameTrans": "Surah al-Qasas",
+            "fileName": "tamilsura-028.mp3",
+            "size": "18.9M",
+            "durationInSecs": 1594
+        },
+        {
+            "index": 29,
+            "name": "ஸூரத்துல் அன்கபூத்",
+            "nameTrans": "Surah al-`Ankabut",
+            "fileName": "tamilsura-029.mp3",
+            "size": "14.3M",
+            "durationInSecs": 1184
+        },
+        {
+            "index": 30,
+            "name": "ஸூரத்துர் ரூம்",
+            "nameTrans": "Surah ar-Rum",
+            "fileName": "tamilsura-030.mp3",
+            "size": "11.6M",
+            "durationInSecs": 936
+        },
+        {
+            "index": 31,
+            "name": "ஸூரத்து லுக்மான்",
+            "nameTrans": "Surah Luqman",
+            "fileName": "tamilsura-031.mp3",
+            "size": "8.0M",
+            "durationInSecs": 936
+        },
+        {
+            "index": 32,
+            "name": "ஸூரத்துஸ் ஸஜ்தா",
+            "nameTrans": "Surah as-Sajdah",
+            "fileName": "tamilsura-032.mp3",
+            "size": "5.1M",
+            "durationInSecs": 419
+        },
+        {
+            "index": 33,
+            "name": "ஸூரத்துல் அஹ்ஜாப",
+            "nameTrans": "Surah al-Ahzab",
+            "fileName": "tamilsura-033.mp3",
+            "size": "18.3M",
+            "durationInSecs": 1506
+        },
+        {
+            "index": 34,
+            "name": "ஸூரத்துஸ் ஸபா",
+            "nameTrans": "Surah Saba'",
+            "fileName": "tamilsura-034.mp3",
+            "size": "13.1M",
+            "durationInSecs": 1008
+        },
+        {
+            "index": 35,
+            "name": "ஸூரத்து ஃபாத்திர்",
+            "nameTrans": "Surah Fatir",
+            "fileName": "tamilsura-035.mp3",
+            "size": "11.8M",
+            "durationInSecs": 913
+        },
+        {
+            "index": 36,
+            "name": "ஸூரத்து யாஸீன்",
+            "nameTrans": "Surah Ya Sin",
+            "fileName": "tamilsura-036.mp3",
+            "size": "11.0M",
+            "durationInSecs": 890
+        },
+        {
+            "index": 37,
+            "name": "ஸூரத்துஸ் ஸாஃப்ஃபாத்",
+            "nameTrans": "Surah as-Saffat",
+            "fileName": "tamilsura-037.mp3",
+            "size": "14.3M",
+            "durationInSecs": 1192
+        },
+        {
+            "index": 38,
+            "name": "ஸூரத்து ஸாத்",
+            "nameTrans": "Surah Sad",
+            "fileName": "tamilsura-038.mp3",
+            "size": "10.8M",
+            "durationInSecs": 954
+        },
+        {
+            "index": 39,
+            "name": "ஸூரத்துஜ்ஜுமர்",
+            "nameTrans": "Surah az-Zumar",
+            "fileName": "tamilsura-039.mp3",
+            "size": "15.5M",
+            "durationInSecs": 1300
+        },
+        {
+            "index": 40,
+            "name": "ஸூரத்துல் முஃமின்",
+            "nameTrans": "Surah Ghafir",
+            "fileName": "tamilsura-040.mp3",
+            "size": "16.4M",
+            "durationInSecs": 1360
+        },
+        {
+            "index": 41,
+            "name": "ஸூரத்து ஹாமீம் ஸஜ்தா",
+            "nameTrans": "Surah Fussilat",
+            "fileName": "tamilsura-041.mp3",
+            "size": "11.4M",
+            "durationInSecs": 886
+        },
+        {
+            "index": 42,
+            "name": "ஸூரத்துஷ் ஷூறா",
+            "nameTrans": "Surah ash-Shura",
+            "fileName": "tamilsura-042.mp3",
+            "size": "11.8M",
+            "durationInSecs": 894
+        },
+        {
+            "index": 43,
+            "name": "ஸூரத்துஜ் ஜுக்ருஃப்",
+            "nameTrans": "Surah az-Zukhruf",
+            "fileName": "tamilsura-043.mp3",
+            "size": "13.0M",
+            "durationInSecs": 976
+        },
+        {
+            "index": 44,
+            "name": "ஸூரத்துத் துகான்",
+            "nameTrans": "Surah ad-Dukhan",
+            "fileName": "tamilsura-044.mp3",
+            "size": "5.6M",
+            "durationInSecs": 445
+        },
+        {
+            "index": 45,
+            "name": "ஸூரத்துல் ஜாஸியா",
+            "nameTrans": "Surah al-Jathiyah",
+            "fileName": "tamilsura-045.mp3",
+            "size": "6.5M",
+            "durationInSecs": 518
+        },
+        {
+            "index": 46,
+            "name": "ஸூரத்துல் அஹ்காஃப்",
+            "nameTrans": "Surah al-Ahqaf",
+            "fileName": "tamilsura-046.mp3",
+            "size": "9.5M",
+            "durationInSecs": 742
+        },
+        {
+            "index": 47,
+            "name": "ஸூரத்து முஹம்மது",
+            "nameTrans": "Surah Muhammad",
+            "fileName": "tamilsura-047.mp3",
+            "size": "8.9M",
+            "durationInSecs": 675
+        },
+        {
+            "index": 48,
+            "name": "ஸூரத்துல் ஃபத்ஹ்",
+            "nameTrans": "Surah al-Fath",
+            "fileName": "tamilsura-048.mp3",
+            "size": "9.5M",
+            "durationInSecs": 731
+        },
+        {
+            "index": 49,
+            "name": "ஸூரத்துல் ஹுஜுராத்",
+            "nameTrans": "Surah al-Hujurat",
+            "fileName": "tamilsura-049.mp3",
+            "size": "5.5M",
+            "durationInSecs": 435
+        },
+        {
+            "index": 50,
+            "name": "ஸூரத்து ஃகாஃப்",
+            "nameTrans": "Surah Qaf",
+            "fileName": "tamilsura-050.mp3",
+            "size": "6.1M",
+            "durationInSecs": 490
+        },
+        {
+            "index": 51,
+            "name": "ஸூரத்துத் தாரியாத்",
+            "nameTrans": "Surah ad-Dhariyat",
+            "fileName": "tamilsura-051.mp3",
+            "size": "6.0M",
+            "durationInSecs": 464
+        },
+        {
+            "index": 52,
+            "name": "ஸூரத்துத் தூர்",
+            "nameTrans": "Surah at-Tur",
+            "fileName": "tamilsura-052.mp3",
+            "size": "4.7M",
+            "durationInSecs": 364
+        },
+        {
+            "index": 53,
+            "name": "ஸூரத்துந்நஜ்ம்",
+            "nameTrans": "Surah an-Najm",
+            "fileName": "tamilsura-053.mp3",
+            "size": "5.2M",
+            "durationInSecs": 418
+        },
+        {
+            "index": 54,
+            "name": "ஸூரத்துல் கமர்",
+            "nameTrans": "Surah al-Qamar",
+            "fileName": "tamilsura-054.mp3",
+            "size": "6.1M",
+            "durationInSecs": 494
+        },
+        {
+            "index": 55,
+            "name": "ஸூரத்துர் ரஹ்மான்",
+            "nameTrans": "Surah ar-Rahman",
+            "fileName": "tamilsura-055.mp3",
+            "size": "6.7M",
+            "durationInSecs": 558
+        },
+        {
+            "index": 56,
+            "name": "ஸூரத்துல் வாகிஆ",
+            "nameTrans": "Surah al-Waqi`ah",
+            "fileName": "tamilsura-056.mp3",
+            "size": "5.8M",
+            "durationInSecs": 506
+        },
+        {
+            "index": 57,
+            "name": "ஸூரத்துல் ஹதீத்",
+            "nameTrans": "Surah al-Hadid",
+            "fileName": "tamilsura-057.mp3",
+            "size": "8.5M",
+            "durationInSecs": 705
+        },
+        {
+            "index": 58,
+            "name": "ஸூரத்துல் முஜாதலா",
+            "nameTrans": "Surah al-Mujadilah",
+            "fileName": "tamilsura-058.mp3",
+            "size": "6.7M",
+            "durationInSecs": 529
+        },
+        {
+            "index": 59,
+            "name": "ஸூரத்துல் ஹஷ்ர்",
+            "nameTrans": "Surah al-Hashr",
+            "fileName": "tamilsura-059.mp3",
+            "size": "6.6M",
+            "durationInSecs": 518
+        },
+        {
+            "index": 60,
+            "name": "ஸூரத்துல் மும்தஹினா",
+            "nameTrans": "Surah al-Mumtahanah",
+            "fileName": "tamilsura-060.mp3",
+            "size": "5.2M",
+            "durationInSecs": 416
+        },
+        {
+            "index": 61,
+            "name": "ஸூரத்துஸ் ஸஃப்ஃபு",
+            "nameTrans": "Surah as-Saff",
+            "fileName": "tamilsura-061.mp3",
+            "size": "3.1M",
+            "durationInSecs": 247
+        },
+        {
+            "index": 62,
+            "name": "ஸூரத்துல் ஜுமுஆ",
+            "nameTrans": "Surah al-Jumu`ah",
+            "fileName": "tamilsura-062.mp3",
+            "size": "2.4M",
+            "durationInSecs": 194
+        },
+        {
+            "index": 63,
+            "name": "ஸூரத்துல் முனாஃபிஃகூன்",
+            "nameTrans": "Surah al-Munafiqun",
+            "fileName": "tamilsura-063.mp3",
+            "size": "2.7M",
+            "durationInSecs": 213
+        },
+        {
+            "index": 64,
+            "name": "ஸூரத்துத் தஃகாபுன்",
+            "nameTrans": "Surah at-Taghabun",
+            "fileName": "tamilsura-064.mp3",
+            "size": "3.8M",
+            "durationInSecs": 305
+        },
+        {
+            "index": 65,
+            "name": "ஸூரத்துத் தலாஃக்",
+            "nameTrans": "Surah at-Talaq,",
+            "fileName": "tamilsura-065.mp3",
+            "size": "3.9M",
+            "durationInSecs": 330
+        },
+        {
+            "index": 66,
+            "name": "ஸூரத்துத் தஹ்ரீம்",
+            "nameTrans": "Surah at-Tahrim",
+            "fileName": "tamilsura-066.mp3",
+            "size": "3.5M",
+            "durationInSecs": 306
+        },
+        {
+            "index": 67,
+            "name": "ஸூரத்துல் முல்க்",
+            "nameTrans": "Surah al-Mulk",
+            "fileName": "tamilsura-067.mp3",
+            "size": "4.4M",
+            "durationInSecs": 373
+        },
+        {
+            "index": 68,
+            "name": "ஸூரத்துல் கலம்",
+            "nameTrans": "Surah al-Qalam",
+            "fileName": "tamilsura-068.mp3",
+            "size": "4.8M",
+            "durationInSecs": 409
+        },
+        {
+            "index": 69,
+            "name": "ஸூரத்துல் ஹாஃக்ஃகா",
+            "nameTrans": "Surah al-Haqqah",
+            "fileName": "tamilsura-069.mp3",
+            "size": "4.0M",
+            "durationInSecs": 326
+        },
+        {
+            "index": 70,
+            "name": "ஸூரத்துல் மஆரிஜ்",
+            "nameTrans": "Surah al-Ma`arij",
+            "fileName": "tamilsura-070.mp3",
+            "size": "3.5M",
+            "durationInSecs": 291
+        },
+        {
+            "index": 71,
+            "name": "ஸூரத்து நூஹ்",
+            "nameTrans": "Surah Nuh",
+            "fileName": "tamilsura-071.mp3",
+            "size": "3.5M",
+            "durationInSecs": 285
+        },
+        {
+            "index": 72,
+            "name": "ஸூரத்துல் ஜின்னு",
+            "nameTrans": "Surah al-Jinn",
+            "fileName": "tamilsura-072.mp3",
+            "size": "4.1M",
+            "durationInSecs": 345
+        },
+        {
+            "index": 73,
+            "name": "ஸூரத்துல் முஸ்ஸம்மில்",
+            "nameTrans": "Surah al-Muzammil",
+            "fileName": "tamilsura-073.mp3",
+            "size": "2.9M",
+            "durationInSecs": 247
+        },
+        {
+            "index": 74,
+            "name": "ஸூரத்துல் முத்தஸ்ஸிர்",
+            "nameTrans": "Surah al-Mudathir",
+            "fileName": "tamilsura-074.mp3",
+            "size": "4.0M",
+            "durationInSecs": 340
+        },
+        {
+            "index": 75,
+            "name": "ஸூரத்துல் கியாமா",
+            "nameTrans": "Surah al-Qiyamah",
+            "fileName": "tamilsura-075.mp3",
+            "size": "2.6M",
+            "durationInSecs": 217
+        },
+        {
+            "index": 76,
+            "name": "ஸூரத்துத் தஹ்ர்",
+            "nameTrans": "Surah al-Insane",
+            "fileName": "tamilsura-076.mp3",
+            "size": "3.7M",
+            "durationInSecs": 314
+        },
+        {
+            "index": 77,
+            "name": "ஸூரத்துல் முர்ஸலாத்",
+            "nameTrans": "Surah al-Mursalat",
+            "fileName": "tamilsura-077.mp3",
+            "size": "3.0M",
+            "durationInSecs": 258
+        },
+        {
+            "index": 78,
+            "name": "ஸூரத்துந் நபா",
+            "nameTrans": "Surah an-Naba'",
+            "fileName": "tamilsura-078.mp3",
+            "size": "2.6M",
+            "durationInSecs": 204
+        },
+        {
+            "index": 79,
+            "name": "ஸூரத்துந் நாஜிஆத்",
+            "nameTrans": "Surah an-Nazi`at",
+            "fileName": "tamilsura-079.mp3",
+            "size": "3.1M",
+            "durationInSecs": 244
+        },
+        {
+            "index": 80,
+            "name": "ஸூரத்து அபஸ",
+            "nameTrans": "Surah `Abasa",
+            "fileName": "tamilsura-080.mp3",
+            "size": "2.4M",
+            "durationInSecs": 188
+        },
+        {
+            "index": 81,
+            "name": "ஸூரத்துத் தக்வீர்",
+            "nameTrans": "Surah at-Takwir",
+            "fileName": "tamilsura-081.mp3",
+            "size": "1.7M",
+            "durationInSecs": 139
+        },
+        {
+            "index": 82,
+            "name": "ஸூரத்துல் இன்ஃபிதார்",
+            "nameTrans": "Surah al-Infitar",
+            "fileName": "tamilsura-082.mp3",
+            "size": "1.2M",
+            "durationInSecs": 96
+        },
+        {
+            "index": 83,
+            "name": "ஸூரத்துல் முதஃப்ஃபிஃபீன்",
+            "nameTrans": "Surah Al-Mutaffifeen",
+            "fileName": "tamilsura-083.mp3",
+            "size": "2.4M",
+            "durationInSecs": 201
+        },
+        {
+            "index": 84,
+            "name": "ஸூரத்துல் இன்ஷிகாக்",
+            "nameTrans": "Surah al-Inshiqaq",
+            "fileName": "tamilsura-084.mp3",
+            "size": "1.7M",
+            "durationInSecs": 137
+        },
+        {
+            "index": 85,
+            "name": "ஸூரத்துல் புரூஜ்",
+            "nameTrans": "Surah al-Buruj",
+            "fileName": "tamilsura-085.mp3",
+            "size": "1.6M",
+            "durationInSecs": 133
+        },
+        {
+            "index": 86,
+            "name": "ஸூரத்துத் தாரிஃக்",
+            "nameTrans": "Surah at-Tariq",
+            "fileName": "tamilsura-086.mp3",
+            "size": "1.0M",
+            "durationInSecs": 86
+        },
+        {
+            "index": 87,
+            "name": "ஸூரத்துல் அஃலா",
+            "nameTrans": "Surah al-A`la",
+            "fileName": "tamilsura-087.mp3",
+            "size": "1.3M",
+            "durationInSecs": 107
+        },
+        {
+            "index": 88,
+            "name": "ஸூரத்துல் காஷியா",
+            "nameTrans": "Surah al-Ghashiya",
+            "fileName": "tamilsura-088.mp3",
+            "size": "1.4M",
+            "durationInSecs": 121
+        },
+        {
+            "index": 89,
+            "name": "ஸூரத்துல் ஃபஜ்ரி",
+            "nameTrans": "Surah al-Fajr",
+            "fileName": "tamilsura-089.mp3",
+            "size": "2.1M",
+            "durationInSecs": 176
+        },
+        {
+            "index": 90,
+            "name": "ஸூரத்துல் பலத்",
+            "nameTrans": "Surah al-Balad",
+            "fileName": "tamilsura-090.mp3",
+            "size": "1.2M",
+            "durationInSecs": 100
+        },
+        {
+            "index": 91,
+            "name": "ஸூரத்துஷ் ஷம்ஸ்",
+            "nameTrans": "Surah ash-Shams",
+            "fileName": "tamilsura-091.mp3",
+            "size": "1.2M",
+            "durationInSecs": 99
+        },
+        {
+            "index": 92,
+            "name": "ஸூரத்துல் லைல்",
+            "nameTrans": "Surah al-Layl",
+            "fileName": "tamilsura-092.mp3",
+            "size": "1.4M",
+            "durationInSecs": 112
+        },
+        {
+            "index": 93,
+            "name": "ஸூரத்துள் ளுஹா",
+            "nameTrans": "Surah ad-Duha",
+            "fileName": "tamilsura-093.mp3",
+            "size": "784.0K",
+            "durationInSecs": 71
+        },
+        {
+            "index": 94,
+            "name": "ஸூரத்து அலம் நஷ்ரஹ்",
+            "nameTrans": "Surah ash-Sharh",
+            "fileName": "tamilsura-094.mp3",
+            "size": "524.0K",
+            "durationInSecs": 47
+        },
+        {
+            "index": 95,
+            "name": "ஸூரத்துத் தீன்",
+            "nameTrans": "Surah at-Tin",
+            "fileName": "tamilsura-095.mp3",
+            "size": "641.0K",
+            "durationInSecs": 58
+        },
+        {
+            "index": 96,
+            "name": "ஸூரத்துல் அலஃக்",
+            "nameTrans": "Surah al-`Alaq",
+            "fileName": "tamilsura-096.mp3",
+            "size": "1.1M",
+            "durationInSecs": 102
+        },
+        {
+            "index": 97,
+            "name": "ஸூரத்துல் கத்ரி",
+            "nameTrans": "Surah al-qadr",
+            "fileName": "tamilsura-097.mp3",
+            "size": "510.0K",
+            "durationInSecs": 47
+        },
+        {
+            "index": 98,
+            "name": "ஸூரத்துல் பய்யினா",
+            "nameTrans": "Surah al-Bayyinah",
+            "fileName": "tamilsura-098.mp3",
+            "size": "1.3M",
+            "durationInSecs": 116
+        },
+        {
+            "index": 99,
+            "name": "ஸூரத்துஜ் ஜில்ஜால்",
+            "nameTrans": "Surah Az-Zalzala",
+            "fileName": "tamilsura-099.mp3",
+            "size": "625.0K",
+            "durationInSecs": 57
+        },
+        {
+            "index": 100,
+            "name": "ஸூரத்துல் ஆதியாத்தி",
+            "nameTrans": "Surah al-`Adiyat",
+            "fileName": "tamilsura-100.mp3",
+            "size": "778.0K",
+            "durationInSecs": 71
+        },
+        {
+            "index": 101,
+            "name": "ஸூரத்து அல்காரிஆ",
+            "nameTrans": "Surah al-Qari`ah",
+            "fileName": "tamilsura-101.mp3",
+            "size": "644.0K",
+            "durationInSecs": 58
+        },
+        {
+            "index": 102,
+            "name": "ஸூரத்துத் தகாஸுர்",
+            "nameTrans": "Surah at-Takathur",
+            "fileName": "tamilsura-102.mp3",
+            "size": "598.0K",
+            "durationInSecs": 55
+        },
+        {
+            "index": 103,
+            "name": "ஸூரத்துல் அஸ்ரி",
+            "nameTrans": "Surah al-`Asr",
+            "fileName": "tamilsura-103.mp3",
+            "size": "372.0K",
+            "durationInSecs": 34
+        },
+        {
+            "index": 104,
+            "name": "ஸூரத்துல் ஹுமஜா",
+            "nameTrans": "Surah al-Humazah",
+            "fileName": "tamilsura-104.mp3",
+            "size": "625.5K",
+            "durationInSecs": 56
+        },
+        {
+            "index": 105,
+            "name": "ஸூரத்துல் ஃபீல்",
+            "nameTrans": "Surah al-Fil",
+            "fileName": "tamilsura-105.mp3",
+            "size": "413.5K",
+            "durationInSecs": 36
+        },
+        {
+            "index": 106,
+            "name": "ஸூரத்து குறைஷின்",
+            "nameTrans": "Surah al-Quraish",
+            "fileName": "tamilsura-106.mp3",
+            "size": "382.5K",
+            "durationInSecs": 33
+        },
+        {
+            "index": 107,
+            "name": "ஸூரத்துல் மாஊன்",
+            "nameTrans": "Surah al-Ma`un",
+            "fileName": "tamilsura-107.mp3",
+            "size": "509.5K",
+            "durationInSecs": 46
+        },
+        {
+            "index": 108,
+            "name": "ஸூரத்துல் கவ்ஸர்",
+            "nameTrans": "Surah al-Kauthar",
+            "fileName": "tamilsura-108.mp3",
+            "size": "314.5K",
+            "durationInSecs": 27
+        },
+        {
+            "index": 109,
+            "name": "ஸூரத்துல் காஃபிரூன்",
+            "nameTrans": "Surah al-Kafirun",
+            "fileName": "tamilsura-109.mp3",
+            "size": "427.0K",
+            "durationInSecs": 40
+        },
+        {
+            "index": 110,
+            "name": "ஸூரத்துந் நஸ்ர்",
+            "nameTrans": "Surah an-Nasr",
+            "fileName": "tamilsura-110.mp3",
+            "size": "413.0K",
+            "durationInSecs": 34
+        },
+        {
+            "index": 111,
+            "name": "ஸூரத்துல் லஹப்",
+            "nameTrans": "Surah Al-Masad",
+            "fileName": "tamilsura-111.mp3",
+            "size": "419.5K",
+            "durationInSecs": 35
+        },
+        {
+            "index": 112,
+            "name": "ஸூரத்துல் இஃக்லாஸ்",
+            "nameTrans": "Surah al-Ikhlas",
+            "fileName": "tamilsura-112.mp3",
+            "size": "356.0K",
+            "durationInSecs": 30
+        },
+        {
+            "index": 113,
+            "name": "ஸூரத்துல் ஃபலக்",
+            "nameTrans": "Surah al-Falaq",
+            "fileName": "tamilsura-113.mp3",
+            "size": "432.0K",
+            "durationInSecs": 36
+        },
+        {
+            "index": 114,
+            "name": "ஸூரத்துந் நாஸ்",
+            "nameTrans": "Surah an-Nas",
+            "fileName": "tamilsura-114.mp3",
+            "size": "477.5K",
+            "durationInSecs": 40
+        }
+    ]
+}
