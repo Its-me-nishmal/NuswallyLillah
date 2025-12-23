@@ -18,9 +18,25 @@ import { IslamicQuiz } from './components/IslamicQuiz';
 import { IbadahTracker } from './components/IbadahTracker';
 import { HajjGuide } from './components/HajjGuide';
 import { QuranAudio } from './components/QuranAudio';
+import { InstallPWA } from './components/InstallPWA'; // Import InstallPWA
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.DASHBOARD);
+  const [isStandalone, setIsStandalone] = useState(false); // Add standalone state
+
+  useEffect(() => {
+    // Check for standalone mode on mount
+    const checkStandalone = () => {
+      const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches ||
+        (window.navigator as any).standalone ||
+        document.referrer.includes('android-app://');
+      setIsStandalone(isStandaloneMode);
+    };
+
+    checkStandalone();
+    window.addEventListener('resize', checkStandalone); // Re-check on resize just in case
+    return () => window.removeEventListener('resize', checkStandalone);
+  }, []);
 
   // Theme State
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -89,18 +105,24 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-[#F0FDF4] via-[#F5F3FF] to-[#ECFEFF] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-500 overflow-hidden">
-      {/* Sidebar (Desktop) / Bottom Nav (Mobile) */}
-      <Navigation currentView={currentView} setView={setCurrentView} />
+      {!isStandalone ? (
+        <InstallPWA />
+      ) : (
+        <>
+          {/* Sidebar (Desktop) / Bottom Nav (Mobile) */}
+          <Navigation currentView={currentView} setView={setCurrentView} />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full relative overflow-hidden">
-        {/* Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 scroll-smooth no-scrollbar">
-          <div className="max-w-[1600px] mx-auto min-h-full pb-24 md:pb-0">
-            {renderContent()}
-          </div>
-        </div>
-      </main>
+          {/* Main Content Area */}
+          <main className="flex-1 flex flex-col h-full relative overflow-hidden">
+            {/* Scrollable Content Container */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 scroll-smooth no-scrollbar">
+              <div className="max-w-[1600px] mx-auto min-h-full pb-24 md:pb-0">
+                {renderContent()}
+              </div>
+            </div>
+          </main>
+        </>
+      )}
     </div>
   );
 };
