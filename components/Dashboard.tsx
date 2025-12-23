@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState } from '../types';
+import { usePrayerTimes } from '../hooks/usePrayerTimes';
 // import { NextPrayerCard } from './NextPrayerCard';
 import { Library } from './Library';
 import { Shortcuts } from './Shortcuts';
@@ -18,8 +19,17 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDarkMode }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  const [lastRead, setLastRead] = useState<{ surahName: string, ayahNumber: number } | null>(null);
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000); // Update second for clock
+
+    // Load Last Read
+    const savedLastRead = localStorage.getItem('quran_last_read');
+    if (savedLastRead) {
+      setLastRead(JSON.parse(savedLastRead));
+    }
+
     return () => clearInterval(timer);
   }, []);
 
@@ -47,10 +57,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
     setView(id as ViewState);
   };
 
-  // Placeholder for nextPrayer and TimeRemaining, as they are not defined in the original code
-  // You would typically fetch or calculate these values.
-  const nextPrayer = { name: "Fajr", time: "05:00 AM" };
-  const TimeRemaining = "02:30:00";
+  const { nextPrayer } = usePrayerTimes();
+  // const TimeRemaining = "02:30:00"; // No longer needed as nextPrayer includes timeLeft
 
   return (
     <div className="flex flex-col md:flex-row h-full animate-in fade-in duration-500 overflow-hidden">
@@ -152,8 +160,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
 
               <div className="text-left md:text-left flex-1 md:h-full md:flex md:flex-col md:justify-end md:mt-2 min-w-0">
                 <p className="text-[9px] md:text-xs text-emerald-100 font-bold uppercase tracking-wider mb-0 md:mb-1 leading-none">Next</p>
-                <h3 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight leading-none truncate">Asr</h3>
-                <p className="text-emerald-100 font-medium opacity-90 text-[9px] md:text-base whitespace-normal leading-none mt-0.5">In 2h 30m</p>
+                <h3 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight leading-none truncate">{nextPrayer?.name || 'Loading...'}</h3>
+                <p className="text-emerald-100 font-medium opacity-90 text-[9px] md:text-base whitespace-normal leading-none mt-0.5">{nextPrayer ? `In ${nextPrayer.timeLeft}` : 'Calculating...'}</p>
               </div>
             </div>
           </div>
@@ -180,10 +188,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
           </div>
 
           {/* Quran Resume */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group" onClick={() => setView(ViewState.QURAN)}>
+          {/* Quran Resume */}
+          <div
+            className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group"
+            onClick={() => {
+              setView(ViewState.QURAN);
+              // Dispatch event to open last read
+              setTimeout(() => {
+                const event = new CustomEvent('openQuranLastRead');
+                window.dispatchEvent(event);
+              }, 100);
+            }}
+          >
             <div className="overflow-hidden">
               <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Resume</p>
-              <p className="font-bold text-slate-700 dark:text-slate-200 truncate">Al-Kahf</p>
+              <p className="font-bold text-slate-700 dark:text-slate-200 truncate">
+                {lastRead ? lastRead.surahName : "Start Reading"}
+              </p>
+              {lastRead && <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Ayah {lastRead.ayahNumber}</p>}
             </div>
             <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <BookOpen className="w-4 h-4" />

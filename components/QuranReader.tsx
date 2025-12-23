@@ -101,6 +101,45 @@ export const QuranReader: React.FC = () => {
         if (lastRead) localStorage.setItem('quran_last_read', JSON.stringify(lastRead));
     }, [lastRead]);
 
+    // Listen for external navigation event (e.g. from Dashboard)
+    useEffect(() => {
+        const handleOpenLastRead = () => {
+            const saved = localStorage.getItem('quran_last_read');
+            if (saved) {
+                const loc = JSON.parse(saved);
+                // We need to fetch the list if not yet fetched, but selectSurah handles that if we pass the surah object.
+                // However, we might not have 'surahs' state populated yet if this happens too fast on mount.
+                // Ideally we rely on 'surahs' being populated.
+                // Let's defer a it or check if surahs exist.
+
+                // Actually, best is to rely on existing 'lastRead' state if it's already loaded
+                if (loc) {
+                    // We need the full Surah object to call selectSurah.
+                    // We can find it in the 'surahs' list.
+                    // Since 'surahs' are fetched on mount, we should depend on 'surahs'.
+
+                    // We'll set a flag to navigate once surahs are ready
+                    setAutoResumeTarget(loc);
+                }
+            }
+        };
+
+        window.addEventListener('openQuranLastRead', handleOpenLastRead);
+        return () => window.removeEventListener('openQuranLastRead', handleOpenLastRead);
+    }, []);
+
+    const [autoResumeTarget, setAutoResumeTarget] = useState<StoredLocation | null>(null);
+
+    useEffect(() => {
+        if (autoResumeTarget && surahs.length > 0) {
+            const surah = surahs.find(s => s.number === autoResumeTarget.surahNumber);
+            if (surah) {
+                selectSurah(surah, autoResumeTarget.ayahNumber);
+                setAutoResumeTarget(null); // Clear flag
+            }
+        }
+    }, [autoResumeTarget, surahs]);
+
     // --- Fetching Logic ---
 
     useEffect(() => {
@@ -426,8 +465,8 @@ export const QuranReader: React.FC = () => {
                             onClick={toggleSurahPlay}
                             disabled={contentLoading}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs md:text-sm transition-all ${(isAutoPlaying || playingAyah !== null)
-                                    ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30'
-                                    : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-200 dark:shadow-emerald-900/30'
+                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/30'
+                                : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-200 dark:shadow-emerald-900/30'
                                 } ${contentLoading ? 'opacity-70 cursor-wait' : ''}`}
                         >
                             {contentLoading ? (
@@ -630,8 +669,8 @@ export const QuranReader: React.FC = () => {
                                     key={surah.number}
                                     onClick={() => selectSurah(surah)}
                                     className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all text-left group/item ${selectedSurah?.number === surah.number
-                                            ? 'bg-white dark:bg-slate-800 shadow-md shadow-emerald-100 dark:shadow-none ring-1 ring-emerald-50 dark:ring-emerald-900/30'
-                                            : 'hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-sm'
+                                        ? 'bg-white dark:bg-slate-800 shadow-md shadow-emerald-100 dark:shadow-none ring-1 ring-emerald-50 dark:ring-emerald-900/30'
+                                        : 'hover:bg-white/60 dark:hover:bg-slate-800/60 hover:shadow-sm'
                                         }`}
                                 >
                                     <span className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shadow-inner ${selectedSurah?.number === surah.number ? 'bg-emerald-500 text-white' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'}`}>
@@ -711,7 +750,7 @@ export const QuranReader: React.FC = () => {
                                                             updateLastRead(selectedSurah.number, selectedSurah.englishName, ayah.numberInSurah);
                                                         }}
                                                         className={`inline font-quran transition-colors duration-300 cursor-pointer hover:bg-emerald-50/50 dark:hover:bg-emerald-900/20 rounded px-1 ${playingAyah === ayah.numberInSurah ? 'bg-emerald-100/70 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-100 rounded-lg shadow-sm box-decoration-clone' :
-                                                                isBookmarked ? 'bg-amber-100/50 dark:bg-amber-900/20' : 'text-slate-800 dark:text-slate-200'
+                                                            isBookmarked ? 'bg-amber-100/50 dark:bg-amber-900/20' : 'text-slate-800 dark:text-slate-200'
                                                             }`}
                                                         style={{
                                                             fontSize: `${settings.fontSize}px`,
@@ -730,8 +769,8 @@ export const QuranReader: React.FC = () => {
                                                     key={ayah.numberInSurah}
                                                     ref={(el) => { ayahRefs.current[ayah.numberInSurah] = el; }}
                                                     className={`p-6 md:p-10 transition-all duration-500 ${playingAyah === ayah.numberInSurah
-                                                            ? 'bg-emerald-50/60 dark:bg-emerald-900/10 shadow-inner'
-                                                            : 'hover:bg-slate-50/50 dark:hover:bg-white/5'
+                                                        ? 'bg-emerald-50/60 dark:bg-emerald-900/10 shadow-inner'
+                                                        : 'hover:bg-slate-50/50 dark:hover:bg-white/5'
                                                         }`}
                                                 >
                                                     {/* Actions Row */}
@@ -800,8 +839,8 @@ export const QuranReader: React.FC = () => {
                                                 <button
                                                     onClick={(e) => toggleFavorite(e, selectedSurah.number)}
                                                     className={`px-6 py-3 rounded-xl border font-bold transition-all flex items-center gap-2 ${favorites.includes(selectedSurah.number)
-                                                            ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-900/30 text-rose-600 dark:text-rose-400'
-                                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rose-200 hover:text-rose-500'
+                                                        ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-900/30 text-rose-600 dark:text-rose-400'
+                                                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-rose-200 hover:text-rose-500'
                                                         }`}
                                                 >
                                                     <Star className={`w-4 h-4 ${favorites.includes(selectedSurah.number) ? 'fill-current' : ''}`} />
