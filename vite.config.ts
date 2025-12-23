@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
           ]
         },
         workbox: {
+          maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
           // CRITICAL: Exclude ALL PDFs from navigation fallback to prevent SW intercepting them and serving index.html
           navigateFallbackDenylist: [/\.pdf$/],
