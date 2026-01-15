@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ViewState } from '../types';
 import { usePrayerTimes } from '../hooks/usePrayerTimes';
-// import { NextPrayerCard } from './NextPrayerCard';
+import { AnimatedClock } from './AnimatedClock';
+import { PrayerCardSkeleton } from './PrayerCardSkeleton';
+import { PrayerCardError } from './PrayerCardError';
 import { Library } from './Library';
 import { Shortcuts } from './Shortcuts';
 import {
@@ -18,8 +20,11 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDarkMode }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
-
   const [lastRead, setLastRead] = useState<{ surahName: string, ayahNumber: number } | null>(null);
+
+  // Animated header cycling state
+  const [headerState, setHeaderState] = useState<'salam' | 'time' | 'date' | 'hijri'>('salam');
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000); // Update second for clock
@@ -33,8 +38,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
     return () => clearInterval(timer);
   }, []);
 
-  // App Configuration
-  const apps = [
+  // Header cycling effect
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    if (isInitialLoad && headerState === 'salam') {
+      // Show "Salam Believer" for 4 seconds on initial load
+      timeout = setTimeout(() => {
+        setHeaderState('time');
+        setIsInitialLoad(false);
+      }, 4000);
+    } else if (!isInitialLoad) {
+      // Cycle through: time → date → hijri → time (5 seconds each)
+      timeout = setTimeout(() => {
+        if (headerState === 'time') {
+          setHeaderState('date');
+        } else if (headerState === 'date') {
+          setHeaderState('hijri');
+        } else if (headerState === 'hijri') {
+          setHeaderState('time');
+        }
+      }, 5000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [headerState, isInitialLoad]);
+
+  // App Configuration - Memoized for performance
+  const apps = useMemo(() => [
     { id: ViewState.QURAN, title: "Quran", icon: BookOpen, color: "from-emerald-400 to-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20", text: "text-emerald-700 dark:text-emerald-400" },
     { id: ViewState.PRAYER, title: "Prayer", icon: Clock, color: "from-blue-400 to-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20", text: "text-blue-700 dark:text-blue-400" },
     { id: ViewState.TRACKER, title: "Tracker", icon: CheckSquare, color: "from-fuchsia-400 to-fuchsia-600", bg: "bg-fuchsia-50 dark:bg-fuchsia-900/20", text: "text-fuchsia-700 dark:text-fuchsia-400" },
@@ -50,12 +81,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
     { id: ViewState.AI_ASSISTANT, title: "AI Guide", icon: Bot, color: "from-purple-400 to-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20", text: "text-purple-700 dark:text-purple-400" },
     { id: ViewState.DONATE, title: "Sadqah", icon: Heart, color: "from-red-400 to-red-600", bg: "bg-red-50 dark:bg-red-900/20", text: "text-red-700 dark:text-red-400" },
     { id: ViewState.QURAN_AUDIO, title: "Audio", icon: Headphones, color: "from-pink-400 to-pink-600", bg: "bg-pink-50 dark:bg-pink-900/20", text: "text-pink-700 dark:text-pink-400" },
-  ];
+  ], []);
 
-  const handleAppClick = (id: string | ViewState) => {
+  const handleAppClick = useCallback((id: string | ViewState) => {
     if (id === 'SETTINGS' || id === 'INFO') return;
     setView(id as ViewState);
-  };
+  }, [setView]);
 
   const { nextPrayer } = usePrayerTimes();
   // const TimeRemaining = "02:30:00"; // No longer needed as nextPrayer includes timeLeft
@@ -64,107 +95,94 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
     <div className="flex flex-col md:flex-row h-full animate-in fade-in duration-500 overflow-hidden">
 
       {/* --- Side Dock (Launcher) --- */}
-      <div className="w-full md:w-24 lg:w-28 flex-shrink-0 md:h-full overflow-x-auto md:overflow-y-auto no-scrollbar md:border-r border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-3 md:py-6 flex md:flex-col items-center gap-3 md:gap-4 z-20">
+      <nav
+        className="w-full md:w-20 lg:w-20 flex-shrink-0 md:h-full overflow-x-auto md:overflow-y-auto no-scrollbar md:border-r border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm p-2 md:py-3 flex md:flex-col items-center gap-2 md:gap-2 z-20"
+        role="navigation"
+        aria-label="Main application launcher"
+      >
         {apps.map((app) => (
           <button
             key={app.title}
             onClick={() => handleAppClick(app.id)}
-            className="group relative flex flex-col items-center justify-center flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl transition-all duration-300 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg hover:shadow-emerald-50 dark:hover:shadow-emerald-900/20 hover:-translate-y-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleAppClick(app.id);
+              }
+            }}
+            aria-label={`Open ${app.title}`}
+            className="group relative flex flex-col items-center justify-center flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-xl transition-all duration-300 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md hover:shadow-emerald-50 dark:hover:shadow-emerald-900/20 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 dark:focus-visible:ring-emerald-400"
           >
-            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br ${app.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition-transform`}>
-              <app.icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.5} />
+            <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br ${app.color} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform`}>
+              <app.icon className="w-4 h-4 md:w-5 md:h-5" strokeWidth={1.5} aria-hidden="true" />
             </div>
-            <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-1 md:mt-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate w-full text-center px-1">
+            <span className="text-[8px] font-medium text-slate-500 dark:text-slate-400 mt-0.5 md:mt-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate w-full text-center px-0.5">
               {app.title}
             </span>
           </button>
         ))}
-      </div>
+      </nav>
+
 
       {/* --- Main Widget Area --- */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+      <main className="flex-1 overflow-y-auto p-2 md:p-3 space-y-2" role="main">
 
-        {/* Header / Location (Compact) */}
+        {/* Animated Header */}
         <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Salam, Believer</h1>
+          <div className="flex-1 overflow-hidden">
+            {/* Animated cycling text with smooth transitions */}
+            <AnimatedClock headerState={headerState} currentTime={currentTime} />
           </div>
-          <div className="flex items-center gap-3">
-            <span className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-emerald-700 dark:text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-50 dark:border-emerald-900/30">
-              <MapPin className="w-3 h-3" /> Jakarta, ID
+
+          <div className="flex items-center gap-2">
+            <span
+              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-emerald-700 dark:text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-50 dark:border-emerald-900/30"
+              role="status"
+              aria-label="Current location: Jakarta, Indonesia"
+            >
+              <MapPin className="w-2.5 h-2.5" aria-hidden="true" /> Jakarta, ID
             </span>
             {toggleTheme && (
               <button
                 onClick={toggleTheme}
-                className="w-8 h-8 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md flex items-center justify-center text-slate-600 dark:text-yellow-400 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                className="w-7 h-7 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md flex items-center justify-center text-slate-600 dark:text-yellow-400 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
               >
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {isDarkMode ? <Sun className="w-3.5 h-3.5" aria-hidden="true" /> : <Moon className="w-3.5 h-3.5" aria-hidden="true" />}
               </button>
             )}
           </div>
         </div>
 
         {/* Combined Hero Section Grid (Bento Grid) */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-2">
 
-          {/* Main Hero Widget (Time | Gregorian | Hijri) */}
-          <div className="col-span-2 md:col-span-2 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 rounded-2xl md:rounded-[2rem] p-4 md:p-8 text-white shadow-xl shadow-blue-200/50 dark:shadow-blue-900/20 relative overflow-hidden group cursor-pointer flex flex-col justify-center min-h-[140px] md:min-h-[180px]" onClick={() => setView(ViewState.CALENDAR)}>
-            {/* Background Decor */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
-
-            <div className="relative z-10 flex flex-row justify-between items-center h-full gap-2 md:gap-4 text-center">
-
-              {/* COL 1: Time */}
-              <div className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left border-r border-white/10 pr-2 md:pr-6">
-                <span className="text-blue-200 text-[9px] md:text-xs font-bold uppercase tracking-widest mb-0.5">Now</span>
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tighter leading-none">
-                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </h2>
-                <p className="text-[9px] md:text-sm text-blue-100 mt-1 hidden md:block">Time in Jakarta</p>
-              </div>
-
-              {/* COL 2: Gregorian */}
-              <div className="flex-1 flex flex-col justify-center items-center border-r border-white/10 px-2 md:px-6">
-                <span className="text-blue-200 text-[9px] md:text-xs font-bold uppercase tracking-widest mb-0.5">Today</span>
-                <div className="text-xl md:text-4xl font-bold leading-none mb-0.5">
-                  {currentTime.getDate()}
+          {/* Next Prayer - Green Card (Full Width on Mobile, Half on Desktop) */}
+          {!nextPrayer ? (
+            <PrayerCardSkeleton />
+          ) : (
+            <button
+              onClick={() => setView(ViewState.PRAYER)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setView(ViewState.PRAYER);
+                }
+              }}
+              aria-label={`View prayer times. Next prayer is ${nextPrayer.name} in ${nextPrayer.timeLeft}`}
+              className="col-span-1 md:col-span-1 neumorphic-card p-3 md:p-4 flex flex-col justify-center relative overflow-hidden cursor-pointer group min-h-[90px] md:min-h-[130px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+            >
+              <div className="flex flex-row md:flex-row items-center justify-between w-full relative z-10 gap-2 h-full">
+                <div className="text-left flex-1 min-w-0 flex flex-col justify-center">
+                  <h3 className="text-xl md:text-2xl font-bold tracking-tight leading-none truncate text-slate-700 dark:text-slate-200">{nextPrayer.name}</h3>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-medium text-[10px] md:text-xs whitespace-normal leading-none mt-0.5">In {nextPrayer.timeLeft}</p>
                 </div>
-                <div className="text-[10px] md:text-lg font-medium text-blue-100 uppercase tracking-wide">
-                  {currentTime.toLocaleDateString([], { month: 'short' })}
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                 </div>
-                <span className="text-[9px] md:text-sm text-blue-200 opacity-80">
-                  {currentTime.toLocaleDateString([], { weekday: 'short' })}
-                </span>
               </div>
-
-              {/* COL 3: Hijri */}
-              <div className="flex-1 flex flex-col justify-center items-center md:items-end text-center md:text-right pl-2 md:pl-6">
-                <span className="text-blue-200 text-[9px] md:text-xs font-bold uppercase tracking-widest mb-0.5">Hijri</span>
-                <div className="text-xl md:text-4xl font-bold leading-none mb-0.5">15</div>
-                <div className="text-[10px] md:text-lg font-medium text-blue-100 uppercase tracking-wide">Ramadan</div>
-                <span className="text-[9px] md:text-sm text-blue-200 opacity-80">1445 AH</span>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Next Prayer - Green Card (Side Widget) - Half Width on Mobile */}
-          <div className="col-span-1 md:col-span-1 bg-emerald-500 dark:bg-emerald-600 rounded-2xl md:rounded-[2rem] p-2 md:p-6 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/20 text-white flex flex-col justify-center relative overflow-hidden cursor-pointer group hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors min-h-[60px] md:min-h-[180px]" onClick={() => setView(ViewState.PRAYER)}>
-            <div className="absolute left-0 top-0 w-full h-full bg-gradient-to-br from-transparent to-black/10"></div>
-
-            <div className="flex flex-row md:flex-col justify-start md:justify-between items-center md:items-start w-full relative z-10 gap-2 md:gap-0 h-full">
-              <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Clock className="w-4 h-4 md:w-5 md:h-5 text-white" />
-              </div>
-
-              <div className="text-left md:text-left flex-1 md:h-full md:flex md:flex-col md:justify-end md:mt-2 min-w-0">
-                <p className="text-[9px] md:text-xs text-emerald-100 font-bold uppercase tracking-wider mb-0 md:mb-1 leading-none">Next</p>
-                <h3 className="text-lg md:text-3xl lg:text-4xl font-bold tracking-tight leading-none truncate">{nextPrayer?.name || 'Loading...'}</h3>
-                <p className="text-emerald-100 font-medium opacity-90 text-[9px] md:text-base whitespace-normal leading-none mt-0.5">{nextPrayer ? `In ${nextPrayer.timeLeft}` : 'Calculating...'}</p>
-              </div>
-            </div>
-          </div>
+            </button>
+          )}
 
           {/* Library Section (Inside Grid for Bento Layout) - Half Width on Mobile */}
           <div className="col-span-1 md:col-span-1">
@@ -174,135 +192,163 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
         </div>
 
         {/* Quick Stats Row (Compact) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
 
           {/* Qibla */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group" onClick={() => setView(ViewState.QIBLA)}>
-            <div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Qibla</p>
-              <p className="font-bold text-slate-700 dark:text-slate-200">294° NW</p>
+          <button
+            onClick={() => setView(ViewState.QIBLA)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setView(ViewState.QIBLA);
+              }
+            }}
+            aria-label="View Qibla direction. Currently 294 degrees Northwest"
+            className="neumorphic-card p-3 md:p-4 flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            <div className="flex flex-col items-start">
+              <p className="font-bold text-lg md:text-xl text-slate-700 dark:text-slate-200">294° NW</p>
+              <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">Qibla Direction</p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:rotate-45 transition-transform">
-              <Compass className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:rotate-45 transition-transform">
+              <Compass className="w-5 h-5" aria-hidden="true" />
             </div>
-          </div>
+          </button>
 
           {/* Quran Resume */}
-          {/* Quran Resume */}
-          <div
-            className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group"
+          <button
+            className="neumorphic-card p-3 md:p-4 flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
             onClick={() => {
               setView(ViewState.QURAN);
-              // Dispatch event to open last read
               setTimeout(() => {
                 const event = new CustomEvent('openQuranLastRead');
                 window.dispatchEvent(event);
               }, 100);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setView(ViewState.QURAN);
+                setTimeout(() => {
+                  const event = new CustomEvent('openQuranLastRead');
+                  window.dispatchEvent(event);
+                }, 100);
+              }
+            }}
+            aria-label={lastRead ? `Resume reading ${lastRead.surahName} at Ayah ${lastRead.ayahNumber}` : "Start reading Quran"}
           >
-            <div className="overflow-hidden">
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Resume</p>
-              <p className="font-bold text-slate-700 dark:text-slate-200 truncate">
+            <div className="overflow-hidden flex-1 min-w-0 pr-2 text-left flex flex-col items-start">
+              <p className="font-bold text-lg md:text-xl text-slate-700 dark:text-slate-200 truncate">
                 {lastRead ? lastRead.surahName : "Start Reading"}
               </p>
-              {lastRead && <p className="text-[10px] text-emerald-600 dark:text-emerald-400">Ayah {lastRead.ayahNumber}</p>}
+              <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs truncate">
+                {lastRead ? `Resume Ayah ${lastRead.ayahNumber}` : "Open Quran"}
+              </p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <BookOpen className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <BookOpen className="w-5 h-5" aria-hidden="true" />
             </div>
-          </div>
+          </button>
 
           {/* Tracker */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700/50 hover:shadow-md transition-all flex items-center justify-between cursor-pointer group" onClick={() => setView(ViewState.TRACKER)}>
-            <div>
-              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">Streak</p>
-              <p className="font-bold text-slate-700 dark:text-slate-200">5 Days</p>
+          <button
+            onClick={() => setView(ViewState.TRACKER)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setView(ViewState.TRACKER);
+              }
+            }}
+            aria-label="View tracker. Current streak is 5 days"
+            className="neumorphic-card p-3 md:p-4 flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            <div className="flex flex-col items-start">
+              <p className="font-bold text-lg md:text-xl text-slate-700 dark:text-slate-200">5 Days</p>
+              <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">Current Streak</p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-fuchsia-50 dark:bg-fuchsia-900/30 flex items-center justify-center text-fuchsia-600 dark:text-fuchsia-400">
-              <CheckSquare className="w-4 h-4" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <CheckSquare className="w-5 h-5" aria-hidden="true" />
             </div>
-          </div>
+          </button>
 
           {/* Daily Name */}
-          <div className="bg-gradient-to-br from-violet-500 to-purple-600 dark:from-violet-600 dark:to-purple-700 rounded-2xl p-4 shadow-md text-white flex items-center justify-between cursor-pointer hover:brightness-110 transition-all" onClick={() => setView(ViewState.NAMES)}>
-            <div>
-              <p className="text-[10px] text-purple-200 font-bold uppercase">Name</p>
-              <p className="font-bold text-white">Ar-Rahman</p>
+          <button
+            onClick={() => setView(ViewState.NAMES)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setView(ViewState.NAMES);
+              }
+            }}
+            aria-label="View 99 names of Allah. Today's name is Ar-Rahman"
+            className="neumorphic-card p-3 md:p-4 flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            <div className="flex flex-col items-start">
+              <p className="font-bold text-lg md:text-xl text-slate-700 dark:text-slate-200">Ar-Rahman</p>
+              <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">The Most Gracious</p>
             </div>
-            <Sparkles className="w-4 h-4 text-purple-200" />
-          </div>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <Sparkles className="w-5 h-5" aria-hidden="true" />
+            </div>
+          </button>
 
         </div>
 
         {/* Unified Quran Widget - Split Design */}
-        <div className="relative overflow-hidden rounded-3xl shadow-2xl" style={{ minHeight: '240px' }}>
-          {/* Single Diagonal Gradient - Corner to Corner */}
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-teal-500 via-40% via-cyan-400 via-60% via-rose-500 to-purple-600 dark:from-emerald-600 dark:via-teal-600 dark:via-40% dark:via-cyan-500 dark:via-60% dark:via-rose-600 dark:to-purple-700"></div>
-
-          {/* Overlay Glows */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-emerald-300/20 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s' }}></div>
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-300/20 rounded-full blur-3xl pointer-events-none animate-pulse" style={{ animationDuration: '4s', animationDelay: '2s' }}></div>
+        <div className="neumorphic-card relative overflow-hidden" style={{ minHeight: '110px' }}>
 
           {/* Content Grid */}
-          <div className="relative z-10 grid grid-cols-2 h-full">
-            {/* Left Button - READ */}
+          <div className="relative z-10 grid grid-cols-2 h-full divide-x divide-slate-100 dark:divide-slate-700/50">
+            {/* Read Button */}
             <button
               onClick={() => setView(ViewState.QURAN)}
-              className="p-6 flex flex-col justify-between group hover:scale-105 transition-transform duration-300 origin-left"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setView(ViewState.QURAN);
+                }
+              }}
+              aria-label="Read Quran with Arabic text and translations"
+              className="p-3 md:p-4 flex flex-col justify-between group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
             >
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <BookOpen className="w-6 h-6 text-white" />
-                  <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Read</span>
+              <div className="text-left w-full flex flex-col items-start">
+                <h3 className="text-lg md:text-xl font-bold text-slate-700 dark:text-slate-200 mb-0.5">Quran</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">Arabic + Translation</p>
+              </div>
+
+              <div className="mt-2 w-full flex justify-start">
+                <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-xs font-semibold group-hover:gap-2.5 transition-all">
+                  <span>Start Reading</span>
+                  <BookOpen className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Quran</h3>
-                <p className="text-white/90 text-sm mb-3">Arabic with translations</p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-1 bg-white/40 rounded-full"></div>
-                <div className="w-14 h-1 bg-white/70 rounded-full"></div>
-                <div className="w-8 h-1 bg-white/40 rounded-full"></div>
-              </div>
-
-              <div className="mt-4 inline-flex items-center gap-2 text-white/90 text-sm font-semibold group-hover:gap-3 transition-all">
-                <span>Start Reading</span>
-                <BookOpen className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </div>
             </button>
 
-            {/* Right Button - LISTEN */}
+            {/* Listen Button */}
             <button
-              onClick={() => setView(ViewState.QURAN_AUDIO)}
-              className="p-6 flex flex-col justify-between group hover:scale-105 transition-transform duration-300 origin-right"
+              onClick={() => setView((ViewState as any).QURAN_AUDIO || 'QURAN_AUDIO')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setView((ViewState as any).QURAN_AUDIO || 'QURAN_AUDIO');
+                }
+              }}
+              aria-label="Listen to Quran recitations"
+              className="p-3 md:p-4 flex flex-col justify-between group hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset"
             >
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Headphones className="w-6 h-6 text-white" />
-                  <span className="text-xs font-bold text-white/90 uppercase tracking-wider">Listen</span>
+              <div className="text-right w-full flex flex-col items-end">
+                <h3 className="text-lg md:text-xl font-bold text-slate-700 dark:text-slate-200 mb-0.5">Audio</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs">Listen to Recitations</p>
+              </div>
+
+              <div className="mt-2 w-full flex justify-end">
+                <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-[10px] md:text-xs font-semibold group-hover:gap-2.5 transition-all flex-row-reverse">
+                  <span>Play Now</span>
+                  <Headphones className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" aria-hidden="true" />
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Audio</h3>
-                <p className="text-white/90 text-sm mb-3">Multi-language</p>
-              </div>
-
-              <div className="flex items-center gap-1 mb-2">
-                <div className="w-1 h-5 bg-white/60 rounded-full animate-pulse"></div>
-                <div className="w-1 h-6 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-1 h-4 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-1 h-6 bg-white/80 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-                <div className="w-1 h-5 bg-white/60 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-              </div>
-
-              <div className="mt-2 inline-flex items-center gap-2 text-white/90 text-sm font-semibold group-hover:gap-3 transition-all">
-                <span>Start Listening</span>
-                <Play className="w-5 h-5 group-hover:scale-110 transition-transform" fill="white" />
               </div>
             </button>
           </div>
-
-          {/* Center Divider Line */}
-          <div className="absolute top-0 bottom-0 left-1/2 w-px bg-white/20 transform -translate-x-1/2 pointer-events-none"></div>
         </div>
 
         {/* Shortcuts Section */}
@@ -315,7 +361,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
           window.dispatchEvent(event);
         }} />
 
-      </div>
-    </div>
+      </main>
+    </div >
   );
 };

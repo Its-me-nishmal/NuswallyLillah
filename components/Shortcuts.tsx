@@ -107,7 +107,7 @@ export const Shortcuts: React.FC<ShortcutsProps> = ({ onNavigate }) => {
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div className="neumorphic-card p-4">
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center">

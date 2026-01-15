@@ -1,3 +1,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .neumorphic-card {
+        @apply bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl border border-slate-100 dark:border-slate-700/20 rounded-[22px] transition-all duration-300 ease-out;
+
+        /* Light mode – soft, realistic depth */
+        box-shadow:
+            4px 4px 12px rgba(0, 0, 0, 0.06),
+            -4px -4px 12px rgba(255, 255, 255, 0.7);
+    }
+
+    .dark .neumorphic-card {
+        /* Dark mode – deeper but subtle */
+        box-shadow:
+            6px 6px 14px rgba(0, 0, 0, 0.45),
+            -3px -3px 10px rgba(255, 255, 255, 0.04);
+    }
+
+    .neumorphic-card:hover {
+        /* No scale – keep calm */
+        box-shadow:
+            6px 6px 16px rgba(0, 0, 0, 0.08),
+            -6px -6px 16px rgba(255, 255, 255, 0.75);
+    }
+
+    .dark .neumorphic-card:hover {
+        box-shadow:
+            8px 8px 18px rgba(0, 0, 0, 0.55),
+            -4px -4px 12px rgba(255, 255, 255, 0.05);
+    }
+
+    .neumorphic-card:active {
+        transform: scale(0.99);
+    }
+}

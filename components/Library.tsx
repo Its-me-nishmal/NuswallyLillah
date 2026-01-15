@@ -184,24 +184,19 @@ export const Library = () => {
     return (
         <>
             {/* Dashboard Entry Point - Modern Gradient Card (Kept Colorful) */}
-            {/* Dashboard Entry Point - Modern Gradient Card (Kept Colorful) */}
             <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setIsOpen(true)}
-                className="w-full h-full bg-gradient-to-r from-teal-500 to-emerald-600 rounded-2xl md:rounded-3xl p-2 md:p-6 relative overflow-hidden group shadow-lg shadow-teal-500/20 flex flex-row md:flex-col items-center justify-between md:justify-center min-h-[60px] md:min-h-0"
+                className="neumorphic-card w-full h-full p-2 md:p-4 flex flex-row md:flex-row items-center justify-between md:justify-start min-h-[60px] md:min-h-[90px] group"
             >
-                {/* Abstract Background Decoration */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
-                <div className="absolute bottom-0 left-0 w-20 h-20 bg-black/10 rounded-full blur-xl translate-y-1/3 -translate-x-1/4"></div>
-
-                <div className="relative z-10 flex flex-row md:flex-row items-center gap-2 md:gap-3 w-full">
-                    <div className="flex-shrink-0 w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-inner">
-                        <Book className="w-4 h-4 md:w-6 md:h-6" />
+                <div className="flex flex-row items-center justify-between w-full h-full">
+                    <div className="text-left flex-1 min-w-0">
+                        <h3 className="text-lg md:text-xl font-bold text-slate-700 dark:text-slate-200 tracking-tight leading-none truncate">Library</h3>
+                        <p className="text-emerald-600 dark:text-emerald-400 text-[10px] md:text-xs font-medium mt-0.5 leading-tight truncate">Books & Duas</p>
                     </div>
-                    <div className="text-left md:text-left flex-1 min-w-0">
-                        <h3 className="text-sm md:text-xl font-bold text-white tracking-tight leading-none truncate">Library</h3>
-                        <p className="text-teal-100/80 text-[10px] md:text-sm font-medium mt-0.5 md:mt-0 leading-tight truncate">Books & Duas</p>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <Book className="w-5 h-5" />
                     </div>
                 </div>
             </motion.button>
@@ -270,7 +265,7 @@ export const Library = () => {
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     transition={{ delay: index * 0.05 }}
                                                     onClick={() => setActiveCategory(cat.id)}
-                                                    className="relative flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-100 dark:border-white/5 hover:border-emerald-100 dark:hover:border-white/10 hover:shadow-lg hover:shadow-emerald-500/5 active:scale-[0.98] transition-all group overflow-hidden shadow-sm"
+                                                    className="relative flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl border border-slate-100 dark:border-slate-700/30 hover:border-emerald-100 dark:hover:border-slate-600/50 shadow-sm dark:shadow-lg dark:shadow-slate-900/50 hover:shadow-md dark:hover:shadow-xl dark:hover:shadow-slate-900/60 active:scale-[0.98] transition-all group overflow-hidden"
                                                 >
                                                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white shadow-md mb-4 group-hover:scale-110 transition-transform duration-300`}>
                                                         <Book className="w-6 h-6" />
@@ -305,7 +300,7 @@ export const Library = () => {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: i * 0.03 }}
                                                     onClick={() => setActivePdf(asset)}
-                                                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800/40 border border-slate-100 dark:border-white/5 hover:border-emerald-200 dark:hover:border-white/10 hover:shadow-md active:scale-[0.99] transition-all text-left group shadow-sm"
+                                                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl border border-slate-100 dark:border-slate-700/30 hover:border-emerald-200 dark:hover:border-slate-600/50 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-slate-900/50 active:scale-[0.99] transition-all text-left group shadow-sm"
                                                 >
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700/50 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
@@ -340,7 +335,7 @@ export const Library = () => {
                                             key="pdf-viewer"
                                         >
                                             {/* Viewer Container */}
-                                            <div className="flex-1 w-full bg-white/50 dark:bg-slate-900/50 rounded-2xl border border-white/50 dark:border-white/5 overflow-hidden relative min-h-[60vh] flex flex-col items-center shadow-sm">
+                                            <div className="neumorphic-card flex-1 w-full overflow-hidden relative min-h-[60vh] flex flex-col items-center">
 
                                                 <div className="w-full h-full flex justify-center p-4 md:p-8">
                                                     <Document
