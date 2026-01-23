@@ -114,108 +114,65 @@ const ALL_NAMES: NameOfAllah[] = [
 export const NamesOfAllah: React.FC = () => {
    const [search, setSearch] = useState('');
    const [hideMeaning, setHideMeaning] = useState(false);
-   const [currentPlaying, setCurrentPlaying] = useState<number | null>(null);
    const [isPlaying, setIsPlaying] = useState(false);
-   const [autoPlay, setAutoPlay] = useState(false);
    const [currentTime, setCurrentTime] = useState(0);
    const [duration, setDuration] = useState(0);
    const audioRef = useRef<HTMLAudioElement | null>(null);
-
-   // Use refs to avoid stale closures in event listeners
-   const autoPlayRef = useRef(autoPlay);
-   const currentPlayingRef = useRef(currentPlaying);
-
-   // Long press detection
-   const pressTimer = useRef<NodeJS.Timeout | null>(null);
-   const [longPressTriggered, setLongPressTriggered] = useState(false);
-
-   useEffect(() => {
-      autoPlayRef.current = autoPlay;
-   }, [autoPlay]);
-
-   useEffect(() => {
-      currentPlayingRef.current = currentPlaying;
-   }, [currentPlaying]);
+   const containerRef = useRef<HTMLDivElement | null>(null);
+   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
    const filteredNames = ALL_NAMES.filter(n =>
       n.transliteration.toLowerCase().includes(search.toLowerCase()) ||
       n.meaning.toLowerCase().includes(search.toLowerCase())
    );
 
-   const playAudio = async (number: number) => {
-      const audioUrl = `https://cdn.jsdelivr.net/gh/soachishti/Asma-ul-Husna@master/audio/${number}.mp3`;
-
-      if (audioRef.current) {
-         if (currentPlaying === number && isPlaying) {
-            audioRef.current.pause();
-            setIsPlaying(false);
-            return;
-         }
-
-         try {
-            audioRef.current.src = audioUrl;
-            await audioRef.current.play();
-            setCurrentPlaying(number);
-            setIsPlaying(true);
-         } catch (error) {
-            console.error('Error playing audio:', error);
-            setIsPlaying(false);
-         }
-      }
-   };
-
    const togglePlayPause = async () => {
       if (audioRef.current) {
          if (isPlaying) {
             audioRef.current.pause();
             setIsPlaying(false);
+            // Stop auto-scroll
+            if (scrollIntervalRef.current) {
+               clearInterval(scrollIntervalRef.current);
+               scrollIntervalRef.current = null;
+            }
          } else {
             try {
-               if (currentPlaying) {
-                  await audioRef.current.play();
-                  setIsPlaying(true);
-               } else {
-                  playAudio(1);
-               }
+               await audioRef.current.play();
+               setIsPlaying(true);
+               // Start smooth auto-scroll
+               startAutoScroll();
             } catch (error) {
-               console.error('Error toggling playback:', error);
+               console.error('Error playing audio:', error);
                setIsPlaying(false);
             }
          }
       }
    };
 
-   const playNext = () => {
-      if (currentPlayingRef.current && currentPlayingRef.current < 99) {
-         playAudio(currentPlayingRef.current + 1);
+   const startAutoScroll = () => {
+      if (containerRef.current && audioRef.current) {
+         const container = containerRef.current;
+         const audioDuration = audioRef.current.duration;
+         const scrollHeight = container.scrollHeight - container.clientHeight;
+
+         // Calculate scroll speed: total scroll distance / audio duration
+         // Scroll in small increments every 50ms
+         const scrollIncrement = scrollHeight / (audioDuration * 20); // 20 = 1000ms / 50ms
+
+         scrollIntervalRef.current = setInterval(() => {
+            if (container.scrollTop < scrollHeight) {
+               container.scrollTo({
+                  top: container.scrollTop + scrollIncrement,
+                  behavior: 'smooth'
+               });
+            }
+         }, 50);
       }
-   };
-
-   const playFromStart = () => {
-      setAutoPlay(true);
-      playAudio(1);
-   };
-
-   // Long press handlers
-   const handlePressStart = (number: number) => {
-      setLongPressTriggered(false);
-      pressTimer.current = setTimeout(() => {
-         setLongPressTriggered(true);
-         setAutoPlay(true); // Enable auto-play when long pressing
-         playAudio(number);
-      }, 500); // 500ms for long press
-   };
-
-   const handlePressEnd = () => {
-      if (pressTimer.current) {
-         clearTimeout(pressTimer.current);
-         pressTimer.current = null;
-      }
-      setLongPressTriggered(false);
    };
 
    useEffect(() => {
-      const audio = new Audio();
+      const audio = new Audio('/audio/Allah-names.mp3');
       audioRef.current = audio;
 
       const handleTimeUpdate = () => {
@@ -228,9 +185,10 @@ export const NamesOfAllah: React.FC = () => {
 
       const handleEnded = () => {
          setIsPlaying(false);
-         // Check if we should play next using refs to avoid stale closure
-         if (autoPlayRef.current && currentPlayingRef.current && currentPlayingRef.current < 99) {
-            setTimeout(() => playNext(), 100);
+         // Stop auto-scroll when audio ends
+         if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+            scrollIntervalRef.current = null;
          }
       };
 
@@ -244,6 +202,9 @@ export const NamesOfAllah: React.FC = () => {
          audio.removeEventListener('ended', handleEnded);
          audio.pause();
          audio.src = '';
+         if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+         }
       };
    }, []);
 
@@ -265,47 +226,22 @@ export const NamesOfAllah: React.FC = () => {
             <p className="text-slate-500 dark:text-slate-400">The 99 Beautiful Names of Allah</p>
          </div>
 
-         {/* Audio Player Control Bar - Always Visible */}
+         {/* Audio Player Control Bar - Simplified */}
          <div className="sticky top-0 z-40 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-2xl shadow-lg backdrop-blur-lg border border-white/20 mb-4">
             <div className="flex items-center justify-between gap-4 flex-wrap">
                <div className="flex items-center gap-3 flex-1 min-w-[200px]">
                   <button
-                     onClick={playFromStart}
+                     onClick={togglePlayPause}
                      className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all"
-                     title="Play from Start"
+                     title={isPlaying ? "Pause" : "Play all 99 names"}
                   >
-                     <Play className="w-5 h-5" />
+                     {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                   </button>
-                  {currentPlaying && (
-                     <>
-                        <button
-                           onClick={togglePlayPause}
-                           className="p-3 bg-white/20 hover:bg-white/30 rounded-full transition-all"
-                        >
-                           {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                        </button>
-                        <div className="flex-1">
-                           <p className="font-bold text-sm">
-                              {ALL_NAMES[currentPlaying - 1]?.transliteration} ({currentPlaying}/99)
-                           </p>
-                           <p className="text-xs opacity-90">{formatTime(currentTime)} / {formatTime(duration)}</p>
-                        </div>
-                     </>
-                  )}
-                  {!currentPlaying && (
-                     <div className="flex-1">
-                        <p className="font-bold text-sm">Press and hold any name to start</p>
-                        <p className="text-xs opacity-90">Or click "Play from Start" button</p>
-                     </div>
-                  )}
+                  <div className="flex-1">
+                     <p className="font-bold text-sm">99 Names of Allah</p>
+                     <p className="text-xs opacity-90">{formatTime(currentTime)} / {formatTime(duration)}</p>
+                  </div>
                </div>
-               <button
-                  onClick={() => setAutoPlay(!autoPlay)}
-                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${autoPlay ? 'bg-white text-emerald-600' : 'bg-white/20 hover:bg-white/30'
-                     }`}
-               >
-                  {autoPlay ? 'Auto-Play: ON' : 'Auto-Play: OFF'}
-               </button>
             </div>
          </div>
 
@@ -328,25 +264,13 @@ export const NamesOfAllah: React.FC = () => {
             </button>
          </div>
 
-         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir="rtl" ref={containerRef}>
             {filteredNames.map((item) => (
                <div
                   key={item.number}
-                  onMouseDown={() => handlePressStart(item.number)}
-                  onMouseUp={handlePressEnd}
-                  onMouseLeave={handlePressEnd}
-                  onTouchStart={() => handlePressStart(item.number)}
-                  onTouchEnd={handlePressEnd}
-                  className={`group relative bg-white dark:bg-slate-900 border rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer select-none ${currentPlaying === item.number && isPlaying
-                     ? 'border-emerald-500 dark:border-emerald-400 shadow-emerald-100 dark:shadow-emerald-900/40 ring-2 ring-emerald-500/20'
-                     : 'border-emerald-50 dark:border-emerald-900/20 hover:shadow-emerald-50 dark:hover:shadow-emerald-900/20'
-                     }`}
+                  className="group relative bg-white dark:bg-slate-900 border border-emerald-50 dark:border-emerald-900/20 rounded-2xl p-6 flex flex-col items-center justify-center text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 select-none"
                >
                   <span className="absolute top-3 left-3 text-[10px] font-bold text-emerald-200 dark:text-emerald-500/50 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-full">{item.number}</span>
-
-                  {currentPlaying === item.number && isPlaying && (
-                     <VolumeIcon className="absolute top-3 right-3 w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                  )}
 
                   <h3 className="font-quran text-4xl text-slate-800 dark:text-white mb-4 mt-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors" dir="rtl">{item.arabic}</h3>
 
