@@ -215,11 +215,11 @@ export const Library = () => {
                         {/* Header - Light & Glassmorphic */}
                         <div className="flex items-center justify-between px-6 py-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border-b border-white/50 dark:border-white/5 sticky top-0 z-20 shadow-sm">
                             <div className="flex items-center gap-4">
-                                {(activeCategory || activePdf) && (
+                                {activePdf && (
                                     <motion.button
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
-                                        onClick={() => activePdf ? setActivePdf(null) : setActiveCategory(null)}
+                                        onClick={() => setActivePdf(null)}
                                         className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-200 transition-all border border-slate-200 dark:border-slate-700 shadow-sm"
                                     >
                                         <ArrowLeft className="w-5 h-5" />
@@ -227,9 +227,8 @@ export const Library = () => {
                                 )}
                                 <div>
                                     <h2 className="text-xl font-bold text-slate-800 dark:text-white tracking-tight">
-                                        {activePdf ? activePdf.title : (activeCategory || 'Library')}
+                                        {activePdf ? activePdf.title : 'Library'}
                                     </h2>
-                                    {activeCategory && !activePdf && <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Category</p>}
                                     {activePdf && <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Reading Mode</p>}
                                 </div>
                             </div>
@@ -246,159 +245,207 @@ export const Library = () => {
 
                         {/* Content Area */}
                         <div className="flex-1 overflow-y-auto">
-                            <div className="p-4 md:p-6 max-w-5xl mx-auto w-full min-h-full pb-32">
-                                <AnimatePresence mode="wait">
-
-                                    {/* Categories Grid - Adaptive Cards */}
-                                    {!activeCategory && !activePdf && (
+                            <div className="p-4 md:p-6 max-w-6xl mx-auto">
+                                {!activePdf ? (
+                                    <>
+                                        {/* Category Chips - Horizontal at Top */}
                                         <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -20 }}
-                                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                                            key="categories-grid"
+                                            className="flex flex-wrap gap-2 mb-6"
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={{
+                                                hidden: { opacity: 0 },
+                                                visible: {
+                                                    opacity: 1,
+                                                    transition: {
+                                                        staggerChildren: 0.05
+                                                    }
+                                                }
+                                            }}
                                         >
-                                            {CATEGORIES.map((cat, index) => (
+                                            {CATEGORIES.map((cat) => (
                                                 <motion.button
                                                     key={cat.id}
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    transition={{ delay: index * 0.05 }}
+                                                    variants={{
+                                                        hidden: { opacity: 0, y: -10 },
+                                                        visible: { opacity: 1, y: 0 }
+                                                    }}
+                                                    whileHover={{ scale: 1.05, y: -2 }}
+                                                    whileTap={{ scale: 0.95 }}
                                                     onClick={() => setActiveCategory(cat.id)}
-                                                    className="relative flex flex-col p-5 rounded-2xl bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl border border-slate-100 dark:border-slate-700/30 hover:border-emerald-100 dark:hover:border-slate-600/50 shadow-sm dark:shadow-lg dark:shadow-slate-900/50 hover:shadow-md dark:hover:shadow-xl dark:hover:shadow-slate-900/60 active:scale-[0.98] transition-all group overflow-hidden"
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === cat.id
+                                                        ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
+                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md'
+                                                        }`}
                                                 >
-                                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center text-white shadow-md mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                                        <Book className="w-6 h-6" />
-                                                    </div>
-                                                    <div className="text-left w-full">
-                                                        <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg mb-1 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">{cat.label}</h3>
-                                                        <div className="flex items-center justify-between">
-                                                            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium group-hover:text-slate-500 dark:group-hover:text-slate-400">{cat.count} Files</span>
-                                                            <div className="w-6 h-6 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <ChevronRight className="w-3 h-3 text-slate-400" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    {cat.label} ({cat.count})
                                                 </motion.button>
                                             ))}
                                         </motion.div>
-                                    )}
 
-                                    {/* File List - Adaptive Items */}
-                                    {activeCategory && !activePdf && (
-                                        <motion.div
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: -20 }}
-                                            className="space-y-3"
-                                            key="files-list"
-                                        >
-                                            {filteredAssets.map((asset, i) => (
-                                                <motion.button
-                                                    key={asset.id}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.03 }}
-                                                    onClick={() => setActivePdf(asset)}
-                                                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800/70 dark:backdrop-blur-xl border border-slate-100 dark:border-slate-700/30 hover:border-emerald-200 dark:hover:border-slate-600/50 hover:shadow-md dark:hover:shadow-lg dark:hover:shadow-slate-900/50 active:scale-[0.99] transition-all text-left group shadow-sm"
+                                        {/* Files List Below */}
+                                        <AnimatePresence mode="wait">
+                                            {activeCategory ? (
+                                                <motion.div
+                                                    key={activeCategory}
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: 20 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="space-y-3"
                                                 >
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700/50 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                                            <FileText className="w-5 h-5" />
-                                                        </div>
-                                                        <div>
-                                                            <span className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors block">{asset.title}</span>
-                                                            <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">PDF Document</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-700/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-slate-400 dark:text-slate-500 transition-all">
-                                                        <ChevronRight className="w-4 h-4" />
-                                                    </div>
-                                                </motion.button>
-                                            ))}
-                                            {filteredAssets.length === 0 && (
-                                                <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
-                                                    <LibraryIcon className="w-16 h-16 mb-4 opacity-20" />
-                                                    <p>No content available properly yet.</p>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    )}
-
-                                    {/* PDF Viewer - Adaptive Container */}
-                                    {activePdf && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="flex flex-col items-center w-full"
-                                            key="pdf-viewer"
-                                        >
-                                            {/* Viewer Container */}
-                                            <div className="neumorphic-card flex-1 w-full overflow-hidden relative min-h-[60vh] flex flex-col items-center">
-
-                                                <div className="w-full h-full flex justify-center p-4 md:p-8">
-                                                    <Document
-                                                        file={activePdf.path}
-                                                        onLoadSuccess={onDocumentLoadSuccess}
-                                                        loading={
-                                                            <div className="flex flex-col items-center py-20">
-                                                                <div className="animate-spin rounded-full h-10 w-10 border-2 border-emerald-500 border-t-transparent mb-4"></div>
-                                                                <span className="text-emerald-600 dark:text-emerald-400 font-medium animate-pulse">Loading Document...</span>
-                                                            </div>
-                                                        }
-                                                        error={
-                                                            <div className="flex flex-col items-center justify-center py-20 text-rose-500 dark:text-rose-400">
-                                                                <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-3">
-                                                                    <X className="w-6 h-6" />
-                                                                </div>
-                                                                <p className="font-bold">Unable to load document</p>
-                                                                <p className="text-sm opacity-60 mt-1 max-w-xs text-center break-all">{activePdf.path}</p>
-                                                            </div>
-                                                        }
-                                                        className="flex flex-col items-center space-y-8"
+                                                    <motion.h3
+                                                        initial={{ opacity: 0, y: -10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        className="text-lg font-bold text-slate-800 dark:text-white mb-4"
                                                     >
-                                                        {numPages && Array.from({ length: numPages }, (_, index) => (
-                                                            <Page
-                                                                key={`page_${index + 1}`}
-                                                                pageNumber={index + 1}
-                                                                scale={scale}
-                                                                renderTextLayer={false}
-                                                                renderAnnotationLayer={false}
-                                                                className="rounded-lg overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700"
-                                                                width={window.innerWidth > 768 ? 600 : window.innerWidth - 64}
-                                                                loading={
-                                                                    <div className="h-[800px] w-full bg-white dark:bg-slate-800 animate-pulse rounded-lg flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-700">
-                                                                        Loading Page {index + 1}...
-                                                                    </div>
-                                                                }
-                                                            />
-                                                        ))}
-                                                    </Document>
-                                                </div>
-
-                                                {/* Floating Zoom Controls - Adaptive Glassmorphic */}
-                                                {numPages && (
-                                                    <div className="fixed bottom-24 right-6 md:right-12 z-50 flex flex-col gap-2">
-                                                        <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-2xl p-2 shadow-xl shadow-slate-200/50 dark:shadow-black/50 flex flex-col gap-2 ring-1 ring-slate-100 dark:ring-white/5">
-                                                            <button onClick={() => setScale(s => Math.min(2.0, s + 0.2))} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
-                                                                <ZoomIn className="w-5 h-5" />
-                                                            </button>
-                                                            <button onClick={() => setScale(s => Math.max(0.5, s - 0.2))} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
-                                                                <ZoomOut className="w-5 h-5" />
-                                                            </button>
-                                                            <div className="h-[1px] w-full bg-slate-100 dark:bg-white/10 my-1" />
-                                                            <div className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-bold font-mono">
-                                                                {numPages}
+                                                        {CATEGORIES.find(c => c.id === activeCategory)?.label} Files ({filteredAssets.length})
+                                                    </motion.h3>
+                                                    {filteredAssets.map((asset, i) => (
+                                                        <motion.button
+                                                            key={asset.id}
+                                                            initial={{ opacity: 0, x: -20 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            transition={{ delay: i * 0.05, duration: 0.3 }}
+                                                            whileHover={{ scale: 1.02, x: 4 }}
+                                                            whileTap={{ scale: 0.98 }}
+                                                            onClick={() => setActivePdf(asset)}
+                                                            className="w-full flex items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800/70 border border-slate-100 dark:border-slate-700/30 hover:border-emerald-200 dark:hover:border-slate-600/50 hover:shadow-lg transition-all text-left group"
+                                                        >
+                                                            <div className="flex items-center gap-4">
+                                                                <motion.div
+                                                                    whileHover={{ rotate: 5 }}
+                                                                    className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-700/50 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors"
+                                                                >
+                                                                    <FileText className="w-5 h-5" />
+                                                                </motion.div>
+                                                                <div>
+                                                                    <span className="font-bold text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors block">{asset.title}</span>
+                                                                    <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">PDF Document</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                            <motion.div
+                                                                whileHover={{ x: 4 }}
+                                                                className="p-2 rounded-full bg-slate-50 dark:bg-slate-700/50 group-hover:bg-emerald-50 dark:group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-slate-400 dark:text-slate-500 transition-all"
+                                                            >
+                                                                <ChevronRight className="w-4 h-4" />
+                                                            </motion.div>
+                                                        </motion.button>
+                                                    ))}
+                                                    {filteredAssets.length === 0 && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.9 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500"
+                                                        >
+                                                            <LibraryIcon className="w-16 h-16 mb-4 opacity-20" />
+                                                            <p>No files available in this category</p>
+                                                        </motion.div>
+                                                    )}
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ duration: 0.4 }}
+                                                    className="flex flex-col items-center justify-center py-20 text-center"
+                                                >
+                                                    <motion.div
+                                                        initial={{ scale: 0 }}
+                                                        animate={{ scale: 1 }}
+                                                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                                                        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mb-6"
+                                                    >
+                                                        <LibraryIcon className="w-10 h-10 text-white" />
+                                                    </motion.div>
+                                                    <motion.h3
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: 0.3 }}
+                                                        className="text-2xl font-bold text-slate-800 dark:text-white mb-2"
+                                                    >
+                                                        Select a Category
+                                                    </motion.h3>
+                                                    <motion.p
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: 0.4 }}
+                                                        className="text-slate-500 dark:text-slate-400"
+                                                    >
+                                                        Choose a category above to browse PDFs
+                                                    </motion.p>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </>
+                                ) : (
+                                    /* PDF Viewer */
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="flex flex-col items-center w-full h-full min-h-screen"
+                                    >
+                                        <div className="w-full h-full flex justify-center p-4">
+                                            <Document
+                                                file={activePdf.path}
+                                                onDocumentLoadSuccess={onDocumentLoadSuccess}
+                                                loading={
+                                                    <div className="flex flex-col items-center py-20">
+                                                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-emerald-500 border-t-transparent mb-4"></div>
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-medium animate-pulse">Loading Document...</span>
                                                     </div>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
+                                                }
+                                                error={
+                                                    <div className="flex flex-col items-center justify-center py-20 text-rose-500 dark:text-rose-400">
+                                                        <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center mb-3">
+                                                            <X className="w-6 h-6" />
+                                                        </div>
+                                                        <p className="font-bold">Unable to load document</p>
+                                                        <p className="text-sm opacity-60 mt-1 max-w-xs text-center break-all">{activePdf.path}</p>
+                                                    </div>
+                                                }
+                                                className="flex flex-col items-center space-y-8"
+                                            >
+                                                {numPages && Array.from({ length: numPages }, (_, index) => (
+                                                    <React.Fragment key={`page_${index + 1}`}>
+                                                        <Page
+                                                            pageNumber={index + 1}
+                                                            scale={scale}
+                                                            renderTextLayer={false}
+                                                            renderAnnotationLayer={false}
+                                                            className="rounded-lg overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700"
+                                                            width={window.innerWidth > 768 ? 600 : window.innerWidth - 64}
+                                                            loading={
+                                                                <div className="h-[800px] w-full bg-white dark:bg-slate-800 animate-pulse rounded-lg flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-700">
+                                                                    Loading Page {index + 1}...
+                                                                </div>
+                                                            }
+                                                        />
+                                                    </React.Fragment>
+                                                ))}
+                                            </Document>
+                                        </div>
 
-                                </AnimatePresence>
+                                        {/* Floating Zoom Controls */}
+                                        {numPages && (
+                                            <div className="fixed bottom-24 right-6 md:right-12 z-50 flex flex-col gap-2">
+                                                <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-2xl p-2 shadow-xl flex flex-col gap-2">
+                                                    <button onClick={() => setScale(s => Math.min(2.0, s + 0.2))} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                                                        <ZoomIn className="w-5 h-5" />
+                                                    </button>
+                                                    <button onClick={() => setScale(s => Math.max(0.5, s - 0.2))} className="w-10 h-10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                                                        <ZoomOut className="w-5 h-5" />
+                                                    </button>
+                                                    <div className="h-[1px] w-full bg-slate-100 dark:bg-white/10 my-1" />
+                                                    <div className="w-10 h-10 flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs font-bold font-mono">
+                                                        {numPages}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                )}
                             </div>
                         </div>
                     </motion.div>

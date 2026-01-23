@@ -121,6 +121,26 @@ export const NamesOfAllah: React.FC = () => {
    const containerRef = useRef<HTMLDivElement | null>(null);
    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+   // Column count state with localStorage
+   const [columnCount, setColumnCount] = useState<2 | 3 | 4>(() => {
+      const saved = localStorage.getItem('asmaul-husna-columns');
+      return (saved === '2' || saved === '3' || saved === '4') ? parseInt(saved) as 2 | 3 | 4 : 2;
+   });
+
+   const toggleColumns = () => {
+      const newCount = columnCount === 2 ? 3 : columnCount === 3 ? 4 : 2;
+      setColumnCount(newCount);
+      localStorage.setItem('asmaul-husna-columns', newCount.toString());
+   };
+
+   const getColumnClass = () => {
+      switch (columnCount) {
+         case 2: return 'grid-cols-2';
+         case 3: return 'grid-cols-3';
+         case 4: return 'grid-cols-4';
+      }
+   };
+
    const filteredNames = ALL_NAMES.filter(n =>
       n.transliteration.toLowerCase().includes(search.toLowerCase()) ||
       n.meaning.toLowerCase().includes(search.toLowerCase())
@@ -131,17 +151,10 @@ export const NamesOfAllah: React.FC = () => {
          if (isPlaying) {
             audioRef.current.pause();
             setIsPlaying(false);
-            // Stop auto-scroll
-            if (scrollIntervalRef.current) {
-               clearInterval(scrollIntervalRef.current);
-               scrollIntervalRef.current = null;
-            }
          } else {
             try {
                await audioRef.current.play();
                setIsPlaying(true);
-               // Start smooth auto-scroll
-               startAutoScroll();
             } catch (error) {
                console.error('Error playing audio:', error);
                setIsPlaying(false);
@@ -185,11 +198,6 @@ export const NamesOfAllah: React.FC = () => {
 
       const handleEnded = () => {
          setIsPlaying(false);
-         // Stop auto-scroll when audio ends
-         if (scrollIntervalRef.current) {
-            clearInterval(scrollIntervalRef.current);
-            scrollIntervalRef.current = null;
-         }
       };
 
       audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -202,9 +210,6 @@ export const NamesOfAllah: React.FC = () => {
          audio.removeEventListener('ended', handleEnded);
          audio.pause();
          audio.src = '';
-         if (scrollIntervalRef.current) {
-            clearInterval(scrollIntervalRef.current);
-         }
       };
    }, []);
 
@@ -245,8 +250,10 @@ export const NamesOfAllah: React.FC = () => {
             </div>
          </div>
 
-         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white/60 dark:bg-slate-900/60 p-4 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm backdrop-blur-sm sticky top-0 z-30">
-            <div className="relative w-full md:w-80">
+         {/* All Controls in One Row */}
+         <div className="flex flex-wrap gap-3 items-center justify-between bg-white/60 dark:bg-slate-900/60 p-4 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm backdrop-blur-sm sticky top-0 z-30">
+            {/* Search */}
+            <div className="relative flex-1 min-w-[200px]">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
                <input
                   type="text"
@@ -256,15 +263,49 @@ export const NamesOfAllah: React.FC = () => {
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-800 dark:text-white"
                />
             </div>
-            <button
-               onClick={() => setHideMeaning(!hideMeaning)}
-               className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all ${hideMeaning ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}`}
-            >
-               {hideMeaning ? "Show Meanings" : "Hide Meanings (Memorize)"}
-            </button>
+
+            {/* Controls Group */}
+            <div className="flex gap-2 items-center">
+               {/* Hide Meanings Toggle */}
+               <button
+                  onClick={() => setHideMeaning(!hideMeaning)}
+                  className={`p-2.5 rounded-xl transition-all ${hideMeaning ? 'bg-emerald-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}`}
+                  title={hideMeaning ? "Show Meanings" : "Hide Meanings"}
+               >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     {hideMeaning ? (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                     ) : (
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                     )}
+                  </svg>
+               </button>
+
+               {/* Column Selector */}
+               <div className="flex gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-1">
+                  <button
+                     onClick={() => { setColumnCount(2); localStorage.setItem('asmaul-husna-columns', '2'); }}
+                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${columnCount === 2 ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                  >
+                     2
+                  </button>
+                  <button
+                     onClick={() => { setColumnCount(3); localStorage.setItem('asmaul-husna-columns', '3'); }}
+                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${columnCount === 3 ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                  >
+                     3
+                  </button>
+                  <button
+                     onClick={() => { setColumnCount(4); localStorage.setItem('asmaul-husna-columns', '4'); }}
+                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${columnCount === 4 ? 'bg-emerald-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                  >
+                     4
+                  </button>
+               </div>
+            </div>
          </div>
 
-         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" dir="rtl" ref={containerRef}>
+         <div className={`grid ${getColumnClass()} gap-4`} dir="rtl" ref={containerRef}>
             {filteredNames.map((item) => (
                <div
                   key={item.number}
