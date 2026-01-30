@@ -6,6 +6,7 @@ export interface NextPrayerInfo {
     name: string;
     time: string;
     timeLeft: string;
+    status: 'upcoming' | 'active';
 }
 
 export const usePrayerTimes = () => {
@@ -156,6 +157,7 @@ export const usePrayerTimes = () => {
         const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
         let next = null;
+        let active = null;
         let minDiff = Infinity;
 
         const getTodayTime = (timeStr: string) => {
@@ -168,17 +170,48 @@ export const usePrayerTimes = () => {
         for (const p of prayers) {
             const pTime = getTodayTime(timings[p]);
             const diff = pTime.getTime() - currentTime.getTime();
+
+            // Check for active prayer (within last 30 minutes)
+            if (diff <= 0 && diff > -(30 * 60 * 1000)) {
+                // Calculate remaining time for the 30-minute active window
+                const activeTimeLeftMs = (30 * 60 * 1000) + diff;
+                active = {
+                    name: p,
+                    time: timings[p],
+                    timeLeft: formatTimeLeft(activeTimeLeftMs),
+                    status: 'active' as const
+                };
+            }
+
+            // Check for upcoming prayer
             if (diff > 0 && diff < minDiff) {
                 minDiff = diff;
-                next = { name: p, time: timings[p], timeLeft: formatTimeLeft(diff) };
+                next = {
+                    name: p,
+                    time: timings[p],
+                    timeLeft: formatTimeLeft(diff),
+                    status: 'upcoming' as const
+                };
             }
         }
 
-        if (!next) {
+        // Priority: show active prayer if in the 30-min window
+        if (active) {
+            setNextPrayer(active);
+        } else if (next) {
+            setNextPrayer(next);
+        } else {
             // If no next prayer today, show Fajr tomorrow
-            next = { name: 'Fajr', time: timings['Fajr'], timeLeft: 'Tomorrow' };
+            const fajrTime = getTodayTime(timings['Fajr']);
+            fajrTime.setDate(fajrTime.getDate() + 1);
+            const diff = fajrTime.getTime() - currentTime.getTime();
+            setNextPrayer({
+                name: 'Fajr',
+                time: timings['Fajr'],
+                timeLeft: formatTimeLeft(diff),
+                status: 'upcoming'
+            });
         }
-        setNextPrayer(next);
     };
 
     return {

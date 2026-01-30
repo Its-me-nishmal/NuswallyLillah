@@ -50,23 +50,56 @@ export const PrayerDashboard: React.FC = () => {
 
       prayers.forEach(prayer => {
         if (!alarmsRef.current[prayer]) return;
+
         const pTime = parseTime(timings[prayer]);
         const diffMs = pTime.getTime() - currentTime.getTime();
-        const diffMinutes = diffMs / (1000 * 60);
-        const notificationId = `${todayStr}-${prayer}`;
+        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+        const todayStr = currentTime.toDateString();
 
-        if (diffMinutes > 9 && diffMinutes <= 10 && !notifiedRef.current.has(notificationId)) {
-          if (typeof Notification !== 'undefined') {
-            new Notification(`10 Minutes to ${prayer}`, {
-              body: `It is almost time for ${prayer} prayer.`,
-              icon: 'https://cdn-icons-png.flaticon.com/512/3658/3658959.png'
-            });
-          }
-          notifiedRef.current.add(notificationId);
-          const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
-          audio.play().catch(() => { });
+        // 1. 10 Minutes Before
+        const beforeId = `${todayStr}-${prayer}-10min`;
+        if (diffMinutes === 10 && !notifiedRef.current.has(beforeId)) {
+          sendNotification(`10 Minutes to ${prayer}`, `It is almost time for ${prayer}.`, prayer);
+          notifiedRef.current.add(beforeId);
+        }
+
+        // 2. Exact Prayer Time
+        const startId = `${todayStr}-${prayer}-start`;
+        if (diffMinutes === 0 && !notifiedRef.current.has(startId)) {
+          sendNotification(`${prayer} Time Now`, `The time for ${prayer} has started.`, prayer);
+          notifiedRef.current.add(startId);
+        }
+
+        // 3. 30 Minutes After (Transition to Next)
+        const transitionId = `${todayStr}-${prayer}-30min`;
+        if (diffMinutes === -30 && !notifiedRef.current.has(transitionId)) {
+          // Find next prayer to show details
+          const nextIdx = (prayers.indexOf(prayer) + 1) % prayers.length;
+          const nextP = prayers[nextIdx];
+          const nextTime = timings[nextP];
+          sendNotification(`Next: ${nextP}`, `${prayer} time has passed. Next prayer is ${nextP} at ${nextTime}.`, nextP);
+          notifiedRef.current.add(transitionId);
         }
       });
+    };
+
+    const sendNotification = (title: string, body: string, prayer: string) => {
+      if (typeof Notification === 'undefined') return;
+
+      const options: any = {
+        body,
+        icon: 'https://cdn-icons-png.flaticon.com/512/3658/3658959.png',
+        tag: 'prayer-status', // Sticky behavior: replaces previous notification with same tag
+        renotify: true, // Vibrate/alert even if replaced
+      };
+
+      try {
+        new Notification(title, options);
+        const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
+        audio.play().catch(() => { });
+      } catch (err) {
+        console.warn("Failed to send notification:", err);
+      }
     };
     checkAlarms();
   }, [currentTime, prayerData]);
@@ -162,7 +195,9 @@ export const PrayerDashboard: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col items-end">
-                  <span className="text-[8px] uppercase font-black tracking-[0.3em] text-emerald-100/70 mb-1">In</span>
+                  <span className="text-[8px] md:text-[9px] uppercase font-black tracking-[0.3em] text-emerald-100/80">
+                    {nextPrayer.status === 'active' ? 'Active Prayer' : 'Next Prayer'}
+                  </span>
                   <div className="text-xl md:text-4xl font-black tracking-tighter tabular-nums leading-none">
                     {nextPrayer.timeLeft}
                   </div>
@@ -184,8 +219,8 @@ export const PrayerDashboard: React.FC = () => {
                 key={name}
                 onClick={() => toggleAlarm(name)}
                 className={`group/card relative flex flex-col justify-between p-3 md:p-6 rounded-[1.2rem] md:rounded-[1.8rem] transition-all duration-300 cursor-pointer border h-full max-h-[120px] md:max-h-none ${isNext
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/10'
-                    : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-white/5 hover:bg-white/70 dark:hover:bg-slate-800/70'
+                  ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500/50 shadow-md ring-1 ring-emerald-500/10'
+                  : 'bg-white/40 dark:bg-slate-900/40 border-slate-200/50 dark:border-white/5 hover:bg-white/70 dark:hover:bg-slate-800/70'
                   }`}
               >
                 <div className="w-full flex justify-between items-center">
@@ -198,8 +233,8 @@ export const PrayerDashboard: React.FC = () => {
                       toggleAlarm(name);
                     }}
                     className={`p-1 rounded-lg transition-all ${isAlarmSet
-                        ? 'text-white bg-emerald-500 shadow-sm'
-                        : 'text-slate-300 dark:text-slate-700 hover:text-emerald-500'
+                      ? 'text-white bg-emerald-500 shadow-sm'
+                      : 'text-slate-300 dark:text-slate-700 hover:text-emerald-500'
                       }`}
                   >
                     {isAlarmSet ? <Bell className="w-3 h-3 fill-current" /> : <BellOff className="w-3 h-3" />}
