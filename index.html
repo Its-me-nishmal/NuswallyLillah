@@ -97,40 +97,13 @@
   }
 }
 </script>
-  <link rel="stylesheet" href="/index.css">
 </head>
 
 <body
   class="text-slate-800 antialiased selection:bg-emerald-200 selection:text-emerald-900 overflow-hidden dark:text-slate-100">
   <div id="root"></div>
   <script type="module" src="./index.tsx"></script>
-  <script type="module" src="/index.tsx"></script>
 
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('✅ Service Worker registered:', registration.scope);
-
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('🔄 New service worker available');
-                  // Optionally notify user of update
-                }
-              });
-            });
-          })
-          .catch((error) => {
-            console.error('❌ Service Worker registration failed:', error);
-          });
-      });
-    }
-  </script>
 </body>
 
 </html>

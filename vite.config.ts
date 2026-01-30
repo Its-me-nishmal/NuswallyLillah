@@ -13,30 +13,42 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      VitePWA({ // Add VitePWA plugin
+      VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+        injectRegister: 'auto',
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'pwa-192x192.png', 'pwa-512x512.png'],
         manifest: {
-          name: 'My Vite App',
-          short_name: 'ViteApp',
-          theme_color: '#ffffff',
+          name: 'Nuswally Lillah',
+          short_name: 'Nuswally',
+          description: 'Regional Prayer Times and Islamic Resources',
+          theme_color: '#059669',
+          background_color: '#F0FDF4',
+          display: 'standalone',
+          orientation: 'portrait',
           icons: [
             {
               src: 'pwa-192x192.png',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any maskable'
             },
             {
               src: 'pwa-512x512.png',
               sizes: '512x512',
-              type: 'image/png'
+              type: 'image/png',
+              purpose: 'any maskable'
+            },
+            {
+              src: 'pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'apple-touch-icon'
             }
           ]
         },
         workbox: {
           maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
-          // CRITICAL: Exclude ALL PDFs from navigation fallback to prevent SW intercepting them and serving index.html
           navigateFallbackDenylist: [/\.pdf$/],
           runtimeCaching: [
             {
@@ -46,21 +58,7 @@ export default defineConfig(({ mode }) => {
                 cacheName: 'prayer-times-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 // 24 hours
-                },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
-              }
-            },
-            {
-              urlPattern: /^\/dex\/.*\.pdf$/i, // Update cache pattern to match dex path
-              handler: 'StaleWhileRevalidate',
-              options: {
-                cacheName: 'pdf-dex-cache',
-                expiration: {
-                  maxEntries: 50,
-                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  maxAgeSeconds: 60 * 60 * 24
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
@@ -69,6 +67,10 @@ export default defineConfig(({ mode }) => {
             }
           ]
         },
+        devOptions: {
+          enabled: true,
+          type: 'module'
+        }
       })
     ],
     define: {
