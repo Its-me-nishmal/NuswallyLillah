@@ -134,4 +134,27 @@ export interface LastListened {
   timestamp: number;
 }
 
+
 export type PlaybackMode = 'sequential' | 'loop-one' | 'loop-all' | 'shuffle';
+
+// Location Types
+export interface KeralaLocation {
+  id: number;
+  name: string;
+}
+
+export interface KeralaDistrict {
+  id: number;
+  name: string;
+  locations: KeralaLocation[];
+}
+
+export interface UserLocation {
+  type: 'kerala' | 'other';
+  districtId?: number;
+  locationId?: number;
+  locationName?: string;
+  districtName?: string;
+  latitude?: number;
+  longitude?: number;
+}

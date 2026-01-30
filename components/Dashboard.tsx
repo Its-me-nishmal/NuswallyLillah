@@ -9,8 +9,9 @@ import { Shortcuts } from './Shortcuts';
 import {
   BookOpen, Clock, CalendarDays, CheckSquare, Compass, MessageCircle,
   Sparkles, BookHeart, Plane, HelpCircle, Calculator, Users, Bot,
-  Heart, Settings, Info, MapPin, Search, Moon, Sun, Headphones, Play
+  Heart, Settings, Info, MapPin, Search, Moon, Sun, Headphones, Play, Edit2
 } from 'lucide-react';
+import { LocationPicker } from './LocationPicker';
 
 interface DashboardProps {
   setView: (view: ViewState) => void;
@@ -21,6 +22,17 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDarkMode }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [lastRead, setLastRead] = useState<{ surahName: string, ayahNumber: number } | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+
+  const { nextPrayer, locationInfo } = usePrayerTimes();
+
+  // Check if location is set, otherwise show picker
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('user_location');
+    if (!savedLocation) {
+      setShowLocationPicker(true);
+    }
+  }, []);
 
   // Animated header cycling state
   const [headerState, setHeaderState] = useState<'salam' | 'time' | 'date' | 'hijri'>('salam');
@@ -88,7 +100,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
     setView(id as ViewState);
   }, [setView]);
 
-  const { nextPrayer } = usePrayerTimes();
+
   // const TimeRemaining = "02:30:00"; // No longer needed as nextPrayer includes timeLeft
 
   return (
@@ -135,13 +147,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
           </div>
 
           <div className="flex items-center gap-2">
-            <span
-              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-emerald-700 dark:text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-50 dark:border-emerald-900/30"
+            <button
+              onClick={() => setShowLocationPicker(true)}
+              className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-emerald-700 dark:text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm border border-emerald-50 dark:border-emerald-900/30 hover:bg-emerald-50 dark:hover:bg-emerald-900/40 transition-colors"
               role="status"
-              aria-label="Current location: Jakarta, Indonesia"
+              aria-label={`Current location: ${locationInfo?.name}`}
             >
-              <MapPin className="w-2.5 h-2.5" aria-hidden="true" /> Jakarta, ID
-            </span>
+              <MapPin className="w-2.5 h-2.5" aria-hidden="true" /> {locationInfo?.name}
+              <Edit2 className="w-2 h-2 ml-1 opacity-50" />
+            </button>
             {toggleTheme && (
               <button
                 onClick={toggleTheme}
@@ -360,6 +374,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ setView, toggleTheme, isDa
           });
           window.dispatchEvent(event);
         }} />
+
+        {showLocationPicker && (
+          <LocationPicker
+            showClose={!!localStorage.getItem('user_location')}
+            onClose={() => setShowLocationPicker(false)}
+            onSelect={(loc) => {
+              localStorage.setItem('user_location', JSON.stringify(loc));
+              setShowLocationPicker(false);
+              window.dispatchEvent(new CustomEvent('locationChanged'));
+            }}
+          />
+        )}
 
       </main>
     </div >

@@ -14,6 +14,7 @@ export const usePrayerTimes = () => {
     const [nextPrayer, setNextPrayer] = useState<NextPrayerInfo | null>(null);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [usingFallback, setUsingFallback] = useState(false);
+    const [locationInfo, setLocationInfo] = useState<{ name: string; type: 'kerala' | 'other' }>({ name: 'Current Location', type: 'other' });
 
     // Fallback times (Approximate standard times for India/General)
     const FALLBACK_TIMES = {
@@ -43,6 +44,50 @@ export const usePrayerTimes = () => {
     // Fetch Logic - Runs ONCE on mount
     useEffect(() => {
         const fetchTimes = async (lat: number, lng: number) => {
+            const savedLocation = localStorage.getItem('user_location');
+            if (savedLocation) {
+                const loc = JSON.parse(savedLocation);
+                if (loc.type === 'kerala' && loc.locationId) {
+                    try {
+                        setLoading(true);
+                        const response = await fetch(`/KERALA-AZAN-DATA-main/${loc.locationId}.json`);
+                        const jsonData = await response.json();
+                        const prayerTimes = jsonData.prayer_times;
+
+                        // Kerala data is an array of MM-DD objects. Find today's.
+                        const today = new Date();
+                        const mmdd = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                        const dayData = prayerTimes.find((d: any) => d.date === mmdd) || prayerTimes[0];
+
+                        // Map Kerala format to Aladhan format
+                        const mappedData = {
+                            timings: {
+                                Fajr: dayData.fajr,
+                                Sunrise: dayData.sunrise,
+                                Dhuhr: dayData.dhuhr,
+                                Asr: dayData.asr,
+                                Maghrib: dayData.maghrib,
+                                Isha: dayData.isha
+                            },
+                            date: {
+                                readable: today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+                                hijri: { day: '', month: { en: '' }, year: '' } // Hijri conversion would need another lib or logic
+                            }
+                        };
+                        setUsingFallback(false);
+                        setPrayerData(mappedData);
+                        const locationName = loc.locationName && loc.districtName
+                            ? `${loc.locationName}, ${loc.districtName}`
+                            : (loc.locationName || 'Kerala');
+                        setLocationInfo({ name: locationName, type: 'kerala' });
+                        setLoading(false);
+                        return;
+                    } catch (err) {
+                        console.error("Failed to fetch Kerala data, falling back to API", err);
+                    }
+                }
+            }
+
             try {
                 setLoading(true);
                 const date = new Date();
@@ -53,6 +98,7 @@ export const usePrayerTimes = () => {
                 if (data.code === 200) {
                     setPrayerData(data.data);
                     setUsingFallback(false);
+                    setLocationInfo({ name: 'Current Location', type: 'other' });
                 } else {
                     throw new Error("API Error");
                 }
@@ -71,16 +117,24 @@ export const usePrayerTimes = () => {
             }
         };
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    fetchTimes(position.coords.latitude, position.coords.longitude);
-                },
-                () => fetchTimes(28.6139, 77.2090) // Default: New Delhi, India
-            );
-        } else {
-            fetchTimes(28.6139, 77.2090);
-        }
+        const handleLocationUpdate = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        fetchTimes(position.coords.latitude, position.coords.longitude);
+                    },
+                    () => fetchTimes(28.6139, 77.2090) // Default: New Delhi, India
+                );
+            } else {
+                fetchTimes(28.6139, 77.2090);
+            }
+        };
+
+        handleLocationUpdate();
+
+        // Listen for location changes
+        window.addEventListener('locationChanged', handleLocationUpdate);
+        return () => window.removeEventListener('locationChanged', handleLocationUpdate);
     }, []);
 
     // Timer Logic
@@ -133,6 +187,7 @@ export const usePrayerTimes = () => {
         nextPrayer,
         currentTime,
         usingFallback,
+        locationInfo,
         FALLBACK_TIMES, // Exported for use in comparisons if needed
         formatTimeLeft // Useful helper
     };
