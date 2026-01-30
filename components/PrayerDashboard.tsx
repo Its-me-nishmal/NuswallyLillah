@@ -18,6 +18,9 @@ export const PrayerDashboard: React.FC = () => {
   // Alarm State
   const [alarms, setAlarms] = useState<Record<string, boolean>>({});
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
 
   // Refs to hold latest state
   const alarmsRef = useRef<Record<string, boolean>>({});
@@ -83,18 +86,28 @@ export const PrayerDashboard: React.FC = () => {
       });
     };
 
-    const sendNotification = (title: string, body: string, prayer: string) => {
-      if (typeof Notification === 'undefined') return;
+    const sendNotification = async (title: string, body: string, prayer: string) => {
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
 
       const options: any = {
         body,
-        icon: 'https://cdn-icons-png.flaticon.com/512/3658/3658959.png',
-        tag: 'prayer-status', // Sticky behavior: replaces previous notification with same tag
-        renotify: true, // Vibrate/alert even if replaced
+        icon: '/pwa-192x192.png',
+        badge: '/pwa-192x192.png',
+        tag: 'prayer-status',
+        renotify: true,
+        vibrate: [200, 100, 200],
+        data: { url: window.location.origin }
       };
 
       try {
-        new Notification(title, options);
+        // Favor Service Worker registration for PWA-friendly notifications (especially on iOS)
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration && 'showNotification' in registration) {
+          await registration.showNotification(title, options);
+        } else {
+          new Notification(title, options);
+        }
+
         const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3');
         audio.play().catch(() => { });
       } catch (err) {
@@ -104,16 +117,22 @@ export const PrayerDashboard: React.FC = () => {
     checkAlarms();
   }, [currentTime, prayerData]);
 
+  const requestNotificationPermission = async () => {
+    if (typeof Notification === 'undefined') return;
+    const result = await Notification.requestPermission();
+    setPermission(result);
+    if (result !== 'granted') {
+      alert("Please enable notifications in your device settings to receive prayer alerts.");
+    }
+  };
+
   const toggleAlarm = async (prayerName: string) => {
     if (typeof Notification === 'undefined') return;
-    let currentPermission = Notification.permission;
-    if (currentPermission !== 'granted') {
-      currentPermission = await Notification.requestPermission();
+    if (Notification.permission !== 'granted') {
+      await requestNotificationPermission();
     }
-    if (currentPermission === 'granted') {
+    if (Notification.permission === 'granted') {
       setAlarms(prev => ({ ...prev, [prayerName]: !prev[prayerName] }));
-    } else {
-      alert("Please enable notifications to allow prayer alerts.");
     }
   };
 

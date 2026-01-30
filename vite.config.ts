@@ -56,13 +56,44 @@ export default defineConfig(({ mode }) => {
               handler: 'NetworkFirst',
               options: {
                 cacheName: 'prayer-times-cache',
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24
-                },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/cdn\.tailwindcss\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'cdn-cache',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-cache',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-files',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 365 },
+                cacheableResponse: { statuses: [0, 200] }
+              }
+            },
+            {
+              urlPattern: /^https:\/\/quranapi\.pages\.dev\/api\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'quran-api-cache',
+                expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 },
+                cacheableResponse: { statuses: [0, 200] }
               }
             }
           ]
