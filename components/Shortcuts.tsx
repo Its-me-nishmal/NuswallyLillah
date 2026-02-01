@@ -35,7 +35,7 @@ const LIBRARY_BOOKS = [
     { name: 'Ajmeer Moulid', path: '/dex/moulid/AjmeerMoulid.pdf' },
     { name: 'Badr Moulid', path: '/dex/moulid/BadrMoulid.pdf' },
     { name: 'CM Moulid', path: '/dex/moulid/cmMoulid.pdf' },
-    { name: 'Yaseen', path: '/dex/moulid/Manqool.pdf' },
+    { name: 'Manqool', path: '/dex/moulid/Manqool.pdf' },
     // Baith
     { name: 'Burda', path: '/dex/baith/burda.pdf' },
     { name: 'Dars', path: '/dex/baith/dars.pdf' },

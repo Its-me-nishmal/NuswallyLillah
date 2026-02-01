@@ -89,6 +89,14 @@ export const DuaCollection: React.FC = () => {
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Fortress of the Muslim</h2>
         <p className="text-slate-500 dark:text-slate-400 mt-1">Authentic supplications for your daily life.</p>
+
+        {/* Help Tip - Direct to Library for PDF Duas */}
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">Looking for PDF Duas (Hizbul Bahar, etc)?</p>
+          <div className="p-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl border border-emerald-100 dark:border-emerald-800/50">
+            <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400">CHECK THE LIBRARY ON DASHBOARD</span>
+          </div>
+        </div>
       </div>
 
       {/* Categories */}
@@ -98,8 +106,8 @@ export const DuaCollection: React.FC = () => {
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${selectedCategory === cat.id
-                ? 'bg-slate-800 dark:bg-emerald-600 text-white shadow-lg scale-105'
-                : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
+              ? 'bg-slate-800 dark:bg-emerald-600 text-white shadow-lg scale-105'
+              : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
           >
             <cat.icon className={`w-4 h-4 ${selectedCategory === cat.id ? 'text-white' : ''}`} />
