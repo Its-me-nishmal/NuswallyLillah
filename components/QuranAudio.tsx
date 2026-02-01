@@ -9,7 +9,8 @@ import tamilData from '../services/tamil-quran.json';
 import mp3QuranData from '../services/mp3quran.json';
 
 interface QuranChapter {
-    index: number;
+    index?: number;
+    id?: number | string;
     name: string;
     nameTrans?: string;
     translation?: string;
@@ -21,7 +22,7 @@ interface QuranChapter {
 }
 
 export const QuranAudio: React.FC = () => {
-    const [selectedLang, setSelectedLang] = useState<'malayalam' | 'tamil' | 'arabic'>('malayalam');
+    const [selectedLang, setSelectedLang] = useState<'malayalam' | 'tamil' | 'arabic'>('arabic');
     const [selectedReciter, setSelectedReciter] = useState(0);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -238,208 +239,234 @@ export const QuranAudio: React.FC = () => {
     return (
         <>
             {/* Main Player View */}
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 p-4 md:p-8 flex items-center justify-center">
-                <div className="max-w-2xl w-full">
-                    {/* Floating Player Card */}
-                    <div className="relative">
-                        {/* Background Glow */}
-                        <div className="absolute -inset-4 bg-gradient-to-br from-emerald-400/20 to-teal-600/20 blur-3xl rounded-full"></div>
+            <div className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 p-4 flex flex-col items-center justify-center font-sans selection:bg-emerald-100">
+                {/* Background Decorative Elements */}
+                <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-400/5 dark:bg-emerald-900/5 blur-[120px] rounded-full"></div>
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-400/5 dark:bg-teal-900/5 blur-[120px] rounded-full"></div>
+                </div>
 
-                        <div className="relative bg-white/80 dark:bg-slate-800/80 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-slate-700/50 p-8 md:p-12">
-                            {/* Header */}
-                            <div className="text-center mb-8">
-                                <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700">
-                                    <Headphones className="w-4 h-4 text-emer ald-600 dark:text-emerald-400" />
-                                    <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">Quran Audio</span>
+                <div className="w-full max-w-[360px] relative z-10">
+                    {/* Compact Card */}
+                    <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-white dark:border-slate-800 p-6">
+
+                        {/* 1. Language Pill Selector (Always Visible) */}
+                        <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl mb-6">
+                            {(['arabic', 'malayalam', 'tamil'] as const).map((lang) => (
+                                <button
+                                    key={lang}
+                                    onClick={() => {
+                                        setSelectedLang(lang);
+                                        setCurrentIndex(0);
+                                        setIsPlaying(false);
+                                    }}
+                                    className={`flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${selectedLang === lang
+                                        ? 'bg-white dark:bg-slate-700 text-emerald-600 shadow-sm'
+                                        : 'text-slate-400 hover:text-slate-600'}`}
+                                >
+                                    {lang === 'arabic' ? 'Arabic' : lang === 'malayalam' ? 'Malayalam' : 'Tamil'}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* 2. Compact Header Info */}
+                        <div className="flex items-center gap-4 mb-6">
+                            {/* Small Rotating Art */}
+                            <div className="relative w-20 h-20 shrink-0">
+                                <div className={`absolute -inset-2 border border-dashed border-emerald-500/20 rounded-full ${isPlaying ? 'animate-spin-slow' : ''}`}></div>
+                                <div className="relative w-full h-full rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-600 shadow-lg flex items-center justify-center text-white text-3xl font-black">
+                                    {current?.index || current?.id || 1}
                                 </div>
-                            </div>
-
-                            {/* Album Art */}
-                            <div className="relative mb-8">
-                                <div className="w-64 h-64 mx-auto rounded-[2rem] bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 shadow-2xl flex items-center justify-center overflow-hidden relative">
-                                    {/* Animated background */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
-                                    <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/20 to-transparent"></div>
-
-                                    {/* Content */}
-                                    <div className="relative z-10 text-center text-white">
-                                        <div className="text-7xl font-bold mb-2">{current?.index || current?.id || 1}</div>
-                                        <div className="text-sm opacity-90 font-medium">{selectedLang === 'arabic' ? (mp3QuranData as any[])[selectedReciter]?.name : selectedLang.toUpperCase()}</div>
+                                {isPlaying && (
+                                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-900">
+                                        <div className="flex gap-0.5 items-end">
+                                            {[0, 1, 2].map(i => (
+                                                <div key={i} className="w-0.5 bg-white rounded-full animate-wave" style={{ height: '8px', animationDelay: `${i * 0.1}s` }}></div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
-                            {/* Track Info */}
-                            <div className="text-center mb-8">
-                                <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white mb-2">
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-lg font-black text-slate-800 dark:text-white truncate leading-tight">
                                     {current?.nameTrans || current?.translation || current?.english_name || 'Loading...'}
                                 </h2>
-                                <p className="text-slate-600 dark:text-slate-300 text-lg">
+                                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1">
                                     {current?.nameMl || current?.name || ''}
                                 </p>
-                            </div>
-
-                            {/* Progress */}
-                            <div className="mb-8">
-                                <div className="relative">
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max={duration || 0}
-                                        value={currentTime}
-                                        onChange={handleSeek}
-                                        className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full appearance-none cursor-pointer"
-                                        style={{
-                                            background: `linear-gradient(to right, rgb(16 185 129) 0%, rgb(16 185 129) ${(currentTime / (duration || 1)) * 100}%, rgb(226 232 240) ${(currentTime / (duration || 1)) * 100}%, rgb(226 232 240) 100%)`
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
-                                    <span>{formatTime(currentTime)}</span>
-                                    <span>{formatTime(duration)}</span>
-                                </div>
-                            </div>
-
-                            {/* Main Controls */}
-                            <div className="flex items-center justify-center gap-3 mb-6">
                                 <button
-                                    onClick={cycleMode}
-                                    className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-all hover:scale-105"
-                                    title={mode}
+                                    onClick={() => setShowModal(true)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
-                                    {getModeIcon()}
+                                    <Music className="w-3 h-3" />
+                                    Change Surah
                                 </button>
+                            </div>
+                        </div>
 
-                                <button
-                                    onClick={handlePrev}
-                                    className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-all hover:scale-105"
+                        {/* 3. Reciter Selector (Arabic Mode Only) */}
+                        {selectedLang === 'arabic' && (
+                            <div className="mb-6 animate-in fade-in slide-in-from-top-2">
+                                <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">Selected Reciter</label>
+                                <select
+                                    value={selectedReciter}
+                                    onChange={(e) => {
+                                        setSelectedReciter(parseInt(e.target.value));
+                                        setCurrentIndex(0);
+                                        setIsPlaying(false);
+                                    }}
+                                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border-none text-slate-800 dark:text-white font-bold text-xs appearance-none focus:ring-2 focus:ring-emerald-500/20"
                                 >
-                                    <SkipBack className="w-6 h-6" fill="currentColor" />
+                                    {(mp3QuranData as any[]).map((r: any, i: number) => (
+                                        <option key={i} value={i}>{r.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* 4. Progress Area */}
+                        <div className="mb-6">
+                            <div className="relative group px-1">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={duration || 0}
+                                    value={currentTime}
+                                    onChange={handleSeek}
+                                    className="quran-slider w-full h-1"
+                                    style={{ '--progress': `${(currentTime / (duration || 1)) * 100}%` } as any}
+                                />
+                            </div>
+                            <div className="flex justify-between text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-2 px-1">
+                                <span>{formatTime(currentTime)}</span>
+                                <span>{formatTime(duration)}</span>
+                            </div>
+                        </div>
+
+                        {/* 5. Playback Controls */}
+                        <div className="flex items-center justify-between gap-2 mb-6">
+                            <button
+                                onClick={cycleMode}
+                                className={`p-2.5 rounded-xl transition-all ${mode !== 'sequential' ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'text-slate-400 hover:text-slate-500'}`}
+                            >
+                                {getModeIcon()}
+                            </button>
+
+                            <div className="flex items-center gap-4">
+                                <button onClick={handlePrev} className="p-2.5 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-75">
+                                    <SkipBack className="w-5 h-5" fill="currentColor" />
                                 </button>
 
                                 <button
                                     onClick={togglePlay}
-                                    className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 flex items-center justify-center text-white shadow-2xl transition-all hover:scale-110"
+                                    className="w-14 h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-emerald-500/30 transition-all active:scale-90"
                                 >
-                                    {isPlaying ? <Pause className="w-9 h-9" fill="currentColor" /> : <Play className="w-9 h-9 ml-1" fill="currentColor" />}
+                                    {isPlaying ? <Pause className="w-6 h-6" fill="currentColor" /> : <Play className="w-6 h-6 ml-1" fill="currentColor" />}
                                 </button>
 
-                                <button
-                                    onClick={handleNext}
-                                    className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-all hover:scale-105"
-                                >
-                                    <SkipForward className="w-6 h-6" fill="currentColor" />
-                                </button>
-
-                                <button
-                                    onClick={download}
-                                    className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-700 dark:text-slate-200 transition-all hover:scale-105"
-                                >
-                                    <Download className="w-5 h-5" />
+                                <button onClick={handleNext} className="p-2.5 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all active:scale-75">
+                                    <SkipForward className="w-5 h-5" fill="currentColor" />
                                 </button>
                             </div>
 
-                            {/* Secondary Controls */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                {/* Volume */}
-                                <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3">
-                                    <button onClick={() => setIsMuted(!isMuted)} className="text-slate-600 dark:text-slate-300">
-                                        {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                                    </button>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="1"
-                                        step="0.01"
-                                        value={volume}
-                                        onChange={(e) => setVolume(parseFloat(e.target.value))}
-                                        className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                                    />
-                                </div>
-
-                                {/* Speed */}
-                                <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3">
-                                    <Gauge className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-                                    <select
-                                        value={speed}
-                                        onChange={(e) => setSpeed(parseFloat(e.target.value))}
-                                        className="flex-1 bg-transparent text-sm font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
-                                    >
-                                        <option value="0.5">0.5x</option>
-                                        <option value="0.75">0.75x</option>
-                                        <option value="1">1x</option>
-                                        <option value="1.25">1.25x</option>
-                                        <option value="1.5">1.5x</option>
-                                        <option value="2">2x</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Browse Button */}
-                            <button
-                                onClick={() => setShowModal(true)}
-                                className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-lg shadow-lg transition-all hover:shadow-xl flex items-center justify-center gap-2"
-                            >
-                                <Music className="w-5 h-5" />
-                                Browse All Surahs
+                            <button onClick={download} className="p-2.5 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all">
+                                <Download className="w-4 h-4" />
                             </button>
+                        </div>
+
+                        {/* 6. Settings Grid (Volume & Speed) */}
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2 flex items-center gap-2">
+                                <button onClick={() => setIsMuted(!isMuted)} className="text-slate-400 hover:text-emerald-500 transition-colors">
+                                    {isMuted || volume === 0 ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                                </button>
+                                <input
+                                    type="range"
+                                    min="0" max="1" step="0.01"
+                                    value={volume}
+                                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                                    className="volume-slider flex-1 h-1"
+                                />
+                            </div>
+
+                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-2 flex items-center gap-2">
+                                <Gauge className="w-3.5 h-3.5 text-slate-400" />
+                                <select
+                                    value={speed}
+                                    onChange={(e) => setSpeed(parseFloat(e.target.value))}
+                                    className="flex-1 bg-transparent text-[9px] font-black uppercase text-slate-600 dark:text-slate-400 outline-none border-none p-0 appearance-none text-center"
+                                >
+                                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map(s => (
+                                        <option key={s} value={s}>{s}x</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <style>{`
+                .quran-slider {
+                    -webkit-appearance: none;
+                    background: #e2e8f0;
+                    border-radius: 999px;
+                    outline: none;
+                }
+                .dark .quran-slider { background: #1e293b; }
+                .quran-slider::-webkit-slider-runnable-track {
+                    background: linear-gradient(to right, #10b981 var(--progress), transparent var(--progress));
+                    height: 4px; border-radius: 999px;
+                }
+                .quran-slider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    width: 12px; height: 12px;
+                    background: #10b981;
+                    border-radius: 50%; border: 2px solid white;
+                    cursor: pointer; margin-top: -4px;
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+                }
+                .volume-slider {
+                    -webkit-appearance: none;
+                    background: #e2e8f0;
+                    border-radius: 999px;
+                    height: 3px;
+                }
+                .dark .volume-slider { background: #334155; }
+                .volume-slider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    width: 8px; height: 8px;
+                    background: #94a3b8; border-radius: 50%; cursor: pointer;
+                }
+                @keyframes wave {
+                    0%, 100% { height: 4px; }
+                    50% { height: 12px; }
+                }
+                .animate-wave { animation: wave 0.6s ease-in-out infinite; }
+                .animate-spin-slow { animation: rotate 12s linear infinite; }
+                @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+            `}</style>
+
             {/* Modal - Chapter List */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200">
-                        {/* Modal Header */}
-                        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-6 z-10">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Select Surah</h3>
-                                <button
-                                    onClick={() => setShowModal(false)}
-                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors"
-                                >
+                <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setShowModal(false)}></div>
+                    <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+                        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 border-b border-slate-100 dark:border-slate-800">
+                            <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Browse Surahs</h3>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Select a chapter to play</p>
+                                </div>
+                                <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all">
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
-
-                            {/* Language/Reciter Selector */}
-                            <div className="space-y-3">
-                                <select
-                                    value={selectedLang}
-                                    onChange={(e) => {
-                                        setSelectedLang(e.target.value as any);
-                                        setCurrentIndex(0);
-                                        setIsPlaying(false);
-                                    }}
-                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                >
-                                    <option value="malayalam">🇮🇳 Malayalam Translation</option>
-                                    <option value="tamil">🇮🇳 Tamil Translation</option>
-                                    <option value="arabic">🇸🇦 Arabic Recitation</option>
-                                </select>
-
-                                {selectedLang === 'arabic' && (
-                                    <select
-                                        value={selectedReciter}
-                                        onChange={(e) => {
-                                            setSelectedReciter(parseInt(e.target.value));
-                                            setCurrentIndex(0);
-                                            setIsPlaying(false);
-                                        }}
-                                        className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                    >
-                                        {(mp3QuranData as any[]).map((r: any, i: number) => (
-                                            <option key={i} value={i}>🎙️ {r.name}</option>
-                                        ))}
-                                    </select>
-                                )}
-                            </div>
                         </div>
 
-                        {/* Chapter List */}
-                        <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-2">
+                        <div className="overflow-y-auto p-4 space-y-2">
                             {chapters.map((ch, idx) => (
                                 <button
                                     key={idx}
@@ -447,33 +474,24 @@ export const QuranAudio: React.FC = () => {
                                         setCurrentIndex(idx);
                                         setShowModal(false);
                                         setIsPlaying(false);
-                                        setTimeout(() => {
-                                            audioRef.current?.play();
-                                            setIsPlaying(true);
-                                        }, 100);
+                                        setTimeout(() => { audioRef.current?.play(); setIsPlaying(true); }, 100);
                                     }}
-                                    className={`w-full p-4 rounded-2xl text-left transition-all hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:scale-[0.98] mb-2 ${currentIndex === idx
-                                        ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
-                                        : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-white'
+                                    className={`w-full group p-4 rounded-2xl text-left transition-all ${currentIndex === idx
+                                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                                        : 'bg-slate-50 dark:bg-slate-800/40 text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <span className={`text-2xl font-bold ${currentIndex === idx ? 'text-white' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${currentIndex === idx ? 'bg-white/20' : 'bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-emerald-600'}`}>
                                             {ch.index || ch.id || idx + 1}
-                                        </span>
+                                        </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-bold text-lg truncate">{ch.nameTrans || ch.translation || ch.english_name}</p>
-                                            <p className={`text-sm truncate ${currentIndex === idx ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                                            <p className="font-bold text-sm truncate">{ch.nameTrans || ch.translation || ch.english_name}</p>
+                                            <p className={`text-[9px] font-black uppercase tracking-wider ${currentIndex === idx ? 'text-white/60' : 'text-slate-400'}`}>
                                                 {ch.nameMl || ch.name}
                                             </p>
                                         </div>
-                                        {currentIndex === idx && isPlaying && (
-                                            <div className="flex gap-0.5 items-center">
-                                                <div className="w-1 h-3 bg-white rounded-full animate-pulse"></div>
-                                                <div className="w-1 h-4 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.1s' }}></div>
-                                                <div className="w-1 h-3 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                                            </div>
-                                        )}
+                                        {currentIndex === idx && isPlaying && <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>}
                                     </div>
                                 </button>
                             ))}
@@ -482,7 +500,7 @@ export const QuranAudio: React.FC = () => {
                 </div>
             )}
 
-            {/* Audio Element - Only render if we have a valid URL */}
+            {/* Audio Element */}
             {audioUrl && (
                 <audio ref={audioRef} src={audioUrl} preload="metadata" />
             )}
