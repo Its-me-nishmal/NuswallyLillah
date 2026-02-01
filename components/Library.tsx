@@ -136,12 +136,23 @@ export const Library = () => {
     const [activePdf, setActivePdf] = useState<Asset | null>(null);
     const [numPages, setNumPages] = useState<number | null>(null);
     const [scale, setScale] = useState(1.0);
+    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Filter assets
-    const filteredAssets = activeCategory
-        ? ASSETS.filter(a => a.category === activeCategory)
-        : [];
+    // Filter assets by category AND search query
+    const filteredAssets = ASSETS.filter(a => {
+        const matchesCategory = activeCategory ? a.category === activeCategory : true;
+        const matchesSearch = a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            a.category.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    // Get count for each category considering search
+    const getCategoryCount = (catId: Category) => {
+        return ASSETS.filter(a => a.category === catId &&
+            (a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                a.category.toLowerCase().includes(searchQuery.toLowerCase()))).length;
+    };
 
     const resetSelection = () => {
         setActivePdf(null);
@@ -248,9 +259,31 @@ export const Library = () => {
                             <div className="p-4 md:p-6 max-w-6xl mx-auto">
                                 {!activePdf ? (
                                     <>
+                                        {/* Search Bar - Modern & Accessible */}
+                                        <div className="relative mb-8">
+                                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <Search className="h-5 w-5 text-slate-400" />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Search by title or category..."
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                className="block w-full pl-11 pr-4 py-4 bg-white dark:bg-slate-800 border-none rounded-2xl shadow-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
+                                            />
+                                            {searchQuery && (
+                                                <button
+                                                    onClick={() => setSearchQuery('')}
+                                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            )}
+                                        </div>
+
                                         {/* Category Chips - Horizontal at Top */}
                                         <motion.div
-                                            className="flex flex-wrap gap-2 mb-6"
+                                            className="flex flex-wrap gap-2 mb-8 no-scrollbar overflow-x-auto pb-2"
                                             initial="hidden"
                                             animate="visible"
                                             variants={{
@@ -263,6 +296,21 @@ export const Library = () => {
                                                 }
                                             }}
                                         >
+                                            <motion.button
+                                                variants={{
+                                                    hidden: { opacity: 0, y: -10 },
+                                                    visible: { opacity: 1, y: 0 }
+                                                }}
+                                                whileHover={{ scale: 1.05, y: -2 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => setActiveCategory(null)}
+                                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!activeCategory
+                                                    ? 'bg-emerald-500 text-white shadow-lg'
+                                                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300'
+                                                    }`}
+                                            >
+                                                All
+                                            </motion.button>
                                             {CATEGORIES.map((cat) => (
                                                 <motion.button
                                                     key={cat.id}
@@ -275,10 +323,10 @@ export const Library = () => {
                                                     onClick={() => setActiveCategory(cat.id)}
                                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeCategory === cat.id
                                                         ? `bg-gradient-to-r ${cat.color} text-white shadow-lg`
-                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-md'
+                                                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300'
                                                         }`}
                                                 >
-                                                    {cat.label} ({cat.count})
+                                                    {cat.label} ({getCategoryCount(cat.id)})
                                                 </motion.button>
                                             ))}
                                         </motion.div>
